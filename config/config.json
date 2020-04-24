@@ -1,0 +1,6 @@
+{
+  "auth": {
+    "expire": 60000,
+    "secret": "ncuhomeok~"
+  }
+}
