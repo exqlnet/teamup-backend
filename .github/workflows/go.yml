@@ -23,6 +23,7 @@ jobs:
           make build
   test:
     name: test
+    needs: [build]
     runs-on: ubuntu-latest
     steps:
     - name: execute test
@@ -36,6 +37,7 @@ jobs:
           make test
   deploy:
     name: Deploy
+    needs: [build, test]
     runs-on: ubuntu-latest
     steps:
     - name: deploy application
