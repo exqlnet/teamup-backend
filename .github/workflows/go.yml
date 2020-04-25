@@ -17,7 +17,7 @@ jobs:
         key: ${{ secrets.PRIVATE_KEY }}
         username: root
         script: |
-          cd ~/teamup
+          cd ~/teamup-backend
           git pull origin master
           docker login -u ${{ secrets.DOCKER_UN}} -p ${{ secrets.DOCKER_PW }} registry.ncuos.com
           make build
@@ -32,7 +32,7 @@ jobs:
         key: ${{ secrets.PRIVATE_KEY }}
         username: root
         script: |
-          cd ~/teamup
+          cd ~/teamup-backend
           make test
   deploy:
     name: Deploy
@@ -45,5 +45,5 @@ jobs:
         key: ${{ secrets.PRIVATE_KEY }}
         username: root
         script: |
-          cd ~/teamup
+          cd ~/teamup-backend
           make deploy
