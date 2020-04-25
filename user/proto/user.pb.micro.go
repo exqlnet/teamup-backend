@@ -59,7 +59,7 @@ func NewUserService(name string, c client.Client) UserService {
 }
 
 func (c *userService) Login(ctx context.Context, in *LoginReq, opts ...client.CallOption) (*LoginRes, error) {
-	req := c.c.NewRequest(c.name, "UserService.login", in)
+	req := c.c.NewRequest(c.name, "UserService.Login", in)
 	out := new(LoginRes)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
@@ -69,7 +69,7 @@ func (c *userService) Login(ctx context.Context, in *LoginReq, opts ...client.Ca
 }
 
 func (c *userService) GetUserInfo(ctx context.Context, in *GetUserInfoReq, opts ...client.CallOption) (*UserInfo, error) {
-	req := c.c.NewRequest(c.name, "UserService.getUserInfo", in)
+	req := c.c.NewRequest(c.name, "UserService.GetUserInfo", in)
 	out := new(UserInfo)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {

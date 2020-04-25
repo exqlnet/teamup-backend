@@ -4,8 +4,8 @@ package teamup.svc.user;
 
 
 service UserService {
-    rpc login(LoginReq) returns (LoginRes);
-    rpc getUserInfo(getUserInfoReq) returns (UserInfo);
+    rpc Login(LoginReq) returns (LoginRes);
+    rpc GetUserInfo(getUserInfoReq) returns (UserInfo);
 }
 
 message LoginReq {
