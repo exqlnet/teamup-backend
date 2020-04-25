@@ -47,7 +47,7 @@ func (us *userServiceImpl) GetUserInfo(ctx context.Context, req *proto.GetUserIn
 func main() {
 
 	service := micro.NewService(
-		micro.Name("go.micro.svc.user"),
+		micro.Name("go.micro.teamup.svc.user"),
 		micro.Flags(
 			&cli.StringFlag{
 				Name:  "app-secret",
