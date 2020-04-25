@@ -19,6 +19,7 @@ jobs:
         script: |
           cd ~/teamup-backend
           git pull origin master
+          go version
           docker login -u ${{ secrets.DOCKER_UN}} -p ${{ secrets.DOCKER_PW }} registry.ncuos.com
           make build
   test:
