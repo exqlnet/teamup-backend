@@ -1,0 +1,303 @@
+{
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "schemes": [
+    "http"
+  ],
+  "swagger": "2.0",
+  "info": {
+    "description": "This documentation describes example APIs found under https://golang-swaggerui-example",
+    "title": "Golang SwaggerUI example",
+    "contact": {
+      "email": "exqlnet@gmail.com"
+    },
+    "license": {
+      "name": "MIT",
+      "url": "http://opensource.org/licenses/MIT"
+    },
+    "version": "1.0.0"
+  },
+  "basePath": "/v1",
+  "paths": {
+    "/user/info": {
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "summary": "获取用户信息",
+        "operationId": "getUserInfo",
+        "responses": {
+          "200": {
+            "$ref": "#/responses/userInfoResp"
+          },
+          "400": {
+            "$ref": "#/responses/badReq"
+          },
+          "401": {
+            "$ref": "#/responses/unauthorized"
+          }
+        }
+      }
+    },
+    "/user/login": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "summary": "用微信授权码登陆",
+        "operationId": "login",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "微信授权码",
+            "name": "code",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/userLoginResp"
+          },
+          "400": {
+            "$ref": "#/responses/badReq"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "AuthToken": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "description": "JWT 认证",
+          "type": "string",
+          "x-go-name": "Token"
+        }
+      },
+      "x-go-package": "teamup/api/swagger"
+    },
+    "UserInfo": {
+      "type": "object",
+      "properties": {
+        "avatar": {
+          "description": "头像",
+          "type": "string",
+          "x-go-name": "Avatar"
+        },
+        "user_id": {
+          "description": "用户ID",
+          "type": "integer",
+          "format": "int32",
+          "x-go-name": "UserID"
+        },
+        "username": {
+          "description": "用户名",
+          "type": "string",
+          "x-go-name": "Username"
+        }
+      },
+      "x-go-package": "teamup/api/swagger"
+    }
+  },
+  "responses": {
+    "badReq": {
+      "description": "Error Bad Request",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "description": "HTTP status code 400 - Status Bad Request",
+            "type": "integer",
+            "format": "int64",
+            "x-go-name": "Code"
+          },
+          "message": {
+            "description": "Detailed error message",
+            "type": "string",
+            "x-go-name": "Message"
+          }
+        }
+      }
+    },
+    "bool": {
+      "description": "Boolean response",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "description": "HTTP Status Code 200",
+            "type": "integer",
+            "format": "int64",
+            "x-go-name": "Code"
+          },
+          "data": {
+            "description": "Boolean true/false",
+            "type": "boolean",
+            "x-go-name": "Data"
+          }
+        }
+      }
+    },
+    "conflict": {
+      "description": "Error Conflict",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "description": "HTTP status code 409 - Conflict",
+            "type": "integer",
+            "format": "int64",
+            "x-go-name": "Code"
+          },
+          "message": {
+            "description": "Detailed error message",
+            "type": "string",
+            "x-go-name": "Message"
+          }
+        }
+      }
+    },
+    "forbidden": {
+      "description": "Error Forbidden",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "description": "HTTP status code 403 - Forbidden",
+            "type": "integer",
+            "format": "int64",
+            "x-go-name": "Code"
+          },
+          "message": {
+            "description": "Detailed error message",
+            "type": "string",
+            "x-go-name": "Message"
+          }
+        }
+      }
+    },
+    "internal": {
+      "description": "Error Interval Server",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "description": "HTTP status code 500 - Internal server error",
+            "type": "integer",
+            "format": "int64",
+            "x-go-name": "Code"
+          },
+          "message": {
+            "description": "Detailed error message",
+            "type": "string",
+            "x-go-name": "Message"
+          }
+        }
+      }
+    },
+    "notFound": {
+      "description": "Error Not Found",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "description": "HTTP status code 404 - Not Found",
+            "type": "integer",
+            "format": "int64",
+            "x-go-name": "Code"
+          },
+          "message": {
+            "description": "Detailed error message",
+            "type": "string",
+            "x-go-name": "Message"
+          }
+        }
+      }
+    },
+    "ok": {
+      "description": "Success response",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "description": "HTTP Status Code 200",
+            "type": "integer",
+            "format": "int64",
+            "x-go-name": "Code"
+          }
+        }
+      }
+    },
+    "unauthorized": {
+      "description": "Error unauthorized",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "description": "HTTP status code 401 - Forbidden",
+            "type": "integer",
+            "format": "int64",
+            "x-go-name": "Code"
+          },
+          "message": {
+            "description": "Detailed error message",
+            "type": "string",
+            "x-go-name": "Message"
+          }
+        }
+      }
+    },
+    "userInfoResp": {
+      "description": "返回的用户信息",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "description": "err code",
+            "type": "integer",
+            "format": "int32",
+            "x-go-name": "Code"
+          },
+          "data": {
+            "$ref": "#/definitions/UserInfo"
+          }
+        }
+      },
+      "headers": {
+        "Body": {}
+      }
+    },
+    "userLoginResp": {
+      "description": "用户登陆",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32",
+            "x-go-name": "Code"
+          },
+          "data": {
+            "$ref": "#/definitions/AuthToken"
+          }
+        }
+      },
+      "headers": {
+        "Body": {}
+      }
+    }
+  },
+  "securityDefinitions": {
+    "bearer": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
+    }
+  }
+}

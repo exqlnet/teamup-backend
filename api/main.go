@@ -3,9 +3,12 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/micro/go-micro/v2/web"
+	"github.com/rakyll/statik/fs"
 	"log"
+	"net/http"
 	. "teamup/api/filter"
 	"teamup/api/server"
+	_ "teamup/api/swagger/statik"
 )
 
 
@@ -23,6 +26,13 @@ func main() {
 	userRouter.GET("/info", server.UserInfoHandler, LoginRequired)
 	userRouter.POST("/login", server.UserLoginHandler)
 
+	// swagger 接口文档
+	staticFS, err := fs.New()
+	if err != nil {
+		log.Fatal(err)
+	}
+	http.FileServer(staticFS)
+	router.StaticFS("/docs", staticFS)
 	service.Handle("/", router)
 	if err := service.Run(); err != nil {
 		log.Fatal(err)
