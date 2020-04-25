@@ -4,4 +4,4 @@ COPY ./api-server /
 
 WORKDIR /
 
-CMD ["api-server"]
+CMD ["/api-server"]

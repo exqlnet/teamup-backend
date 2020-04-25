@@ -1,0 +1,24 @@
+FROM golang:1.14.2-alpine3.11
+
+COPY . /teamup
+
+ENV GOPROXY "https://goproxy.cn"
+
+RUN git clone https://github.com/micro/micro /micro \
+    && cd /micro/cmd/protoc-gen-micro \
+    && go build . && chmod +x protoc-gen-micro \
+    && mv protoc-gen-micro /bin
+
+RUN cd /teamup \
+    && go get github.com/micro/micro/v2 \
+    && go get github.com/golang/protobuf/proto \
+    && go get github.com/golang/protobuf/protoc-gen-go \
+    && go mod download
+
+RUN cd /teamup/api \
+    && go build -o api-server . \
+    && chmod +x /teamup/api/api-server
+
+WORKDIR /teamup/api
+
+CMD ["./api-server"]
