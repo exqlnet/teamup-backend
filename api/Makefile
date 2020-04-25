@@ -1,4 +1,4 @@
-VERSION=1.0
+VERSION=latest
 
 swagger:
 	dir=$(mktemp -d)
@@ -11,8 +11,12 @@ doc: swagger
 	swagger serve swagger.json -p 8887
 
 build:
-	go build -o ./api-server . && chmod +x ./api-server
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o ./api-server . && chmod +x ./api-server
+	docker build . -t registry.ncuos.com/591210216_qq.com/teamup-api:$(VERSION)
 
 run: build
 	docker build . -t teamup-api:$(VERSION)
 	docker run -d teamup-api:$(VERSION)
+
+test:
+	echo "Api server test ok"
