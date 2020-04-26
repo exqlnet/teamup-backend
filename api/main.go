@@ -6,7 +6,7 @@ import (
 	"github.com/rakyll/statik/fs"
 	"log"
 	"net/http"
-	. "teamup/api/filter"
+	"teamup/api/filter"
 	"teamup/api/server"
 	_ "teamup/api/swagger/statik"
 )
@@ -22,8 +22,8 @@ func main() {
 	service.Init()
 	router := gin.Default()
 
-	userRouter := router.Group("/v1/user")
-	userRouter.GET("/info", server.UserInfoHandler, LoginRequired)
+	userRouter := router.Group("/user")
+	userRouter.GET("/info", filter.LoginRequired, server.UserInfoHandler)
 	userRouter.POST("/login", server.UserLoginHandler)
 
 	// swagger 接口文档
