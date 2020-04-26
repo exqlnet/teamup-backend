@@ -7,16 +7,31 @@ import (
 )
 
 func LoginRequired(c *gin.Context) {
+	if c.GetHeader("Authorization") == "" {
+		unAuth(c)
+		return
+	}
 	token := c.GetHeader("Authorization")[7:]
 	secret := config.Cfg.Get("auth", "secret").String("")
 	if secret == "" {
-		c.AbortWithStatus(401)
+		unAuth(c)
+		return
 	}
 
 	userId, err := util.ParseToken(token, secret)
 	if err != nil {
-		c.AbortWithStatus(401)
+		unAuth(c)
+		return
 	}
 
 	c.Set("userId", userId)
+}
+
+
+func unAuth(c *gin.Context) {
+	c.JSON(401, gin.H{
+		"code": 401,
+		"msg": "unauthorized",
+	})
+	c.AbortWithStatus(401)
 }
