@@ -33,7 +33,7 @@ func main() {
 	}
 	http.FileServer(staticFS)
 	router.StaticFS("/docs", staticFS)
-	service.Handle("/", router)
+	service.Handle("/v1", router)
 	if err := service.Run(); err != nil {
 		log.Fatal(err)
 	}
