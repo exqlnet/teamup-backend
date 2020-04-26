@@ -3,9 +3,9 @@ package main
 import (
 	"context"
 	"github.com/emirpasic/gods/utils"
-	"github.com/micro/cli/v2"
 	"github.com/micro/go-micro/v2"
 	"log"
+	"os"
 	"teamup/config"
 	proto "teamup/user/proto"
 	util "teamup/user/util"
@@ -16,6 +16,7 @@ type userServiceImpl struct {}
 func (us *userServiceImpl) Login(ctx context.Context, req *proto.LoginReq, rsp *proto.LoginRes) error {
 	wechatSession, err := util.Code2Session(req.Code)
 	if err != nil {
+		log.Println("err: ", err)
 		return err
 	}
 	if wechatSession.Errcode != 0 {
@@ -48,26 +49,16 @@ func main() {
 
 	service := micro.NewService(
 		micro.Name("go.micro.teamup.svc.user"),
-		micro.Flags(
-			&cli.StringFlag{
-				Name:  "app-secret",
-				Required: true,
-			},
-			&cli.StringFlag{
-				Name: "app-id",
-				Required: true,
-			},
-		),
 	)
 
-	service.Init(micro.Action(func(c *cli.Context) error {
-		config.Init()
-		config.Cfg.Set(c.String("app-secret"), "wechat", "app_secret")
-		config.Cfg.Set(c.String("app-id"), "wechat", "app_id")
-		return nil
-	}))
-
-	config.Cfg.Set("", "app_secret")
+	appSecret := os.Getenv("APP_SECRET")
+	appID := os.Getenv("APP_ID")
+	if appSecret == "" || appID == "" {
+		log.Fatal("APP_SECRET or APP_ID is not set")
+	}
+	service.Init()
+	config.Cfg.Set(appID, "wechat", "app_id")
+	config.Cfg.Set(appSecret, "wechat", "app_secret")
 
 	proto.RegisterUserServiceHandler(service.Server(), &userServiceImpl{})
 
