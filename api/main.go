@@ -22,7 +22,7 @@ func main() {
 	service.Init()
 	router := gin.Default()
 
-	userRouter := router.Group("/user")
+	userRouter := router.Group("/v1/user")
 	userRouter.GET("/info", filter.LoginRequired, server.UserInfoHandler)
 	userRouter.POST("/login", server.UserLoginHandler)
 
@@ -33,7 +33,7 @@ func main() {
 	}
 	http.FileServer(staticFS)
 	router.StaticFS("/docs", staticFS)
-	service.Handle("/v1", router)
+	service.Handle("/", router)
 	if err := service.Run(); err != nil {
 		log.Fatal(err)
 	}
