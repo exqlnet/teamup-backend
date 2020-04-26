@@ -22,7 +22,7 @@ func main() {
 	service.Init()
 	router := gin.Default()
 
-	userRouter := router.Group("/v1")
+	userRouter := router.Group("/v1/user")
 	userRouter.GET("/info", server.UserInfoHandler, LoginRequired)
 	userRouter.POST("/login", server.UserLoginHandler)
 
