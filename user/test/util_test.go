@@ -1,6 +1,9 @@
 package test
 
 import (
+	"log"
+	"os"
+	"teamup/config"
 	"teamup/user/util"
 	"testing"
 )
@@ -27,6 +30,13 @@ func TestJwt(t *testing.T)  {
 }
 
 func TestCode2Session(t *testing.T) {
+	appId := os.Getenv("APP_ID")
+	appSecret := os.Getenv("APP_SECRET")
+	config.Cfg.Set(appId, "wechat", "app_id")
+	config.Cfg.Set(appSecret, "wechat", "app_secret")
+	if appId == "" || appSecret == "" {
+		log.Fatal("err: unable to read config from env")
+	}
 	ws, err := util.Code2Session("123456")
 	if err != nil {
 		t.Fatal(err)

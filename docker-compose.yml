@@ -1,13 +1,13 @@
 version: '2'
 services:
   user-service:
-    image: registry.ncuos.com/591210216_qq.com/teamup-user:latest
+    image: teamup-user:latest
     restart: always
     environment:
       - APP_ID=wx2edea90ce5cfe2c3
       - APP_SECRET=b89a066ad14330ad714478d74e04d0d8
   api-gateway:
-    image: registry.ncuos.com/591210216_qq.com/teamup-api:latest
+    image: teamup-api:latest
     restart: always
     ports:
       - 8888:8888

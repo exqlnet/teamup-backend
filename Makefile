@@ -5,8 +5,7 @@ build:
 	cd api && make build
 
 run: build
-	cd user && make run
-	cd api && make run
+	docker-compose up
 
 test:
 	cd user && make test
@@ -14,6 +13,4 @@ test:
 
 deploy:
 	docker-compose down
-	docker rmi registry.ncuos.com/591210216_qq.com/teamup-user:latest
-	docker rmi registry.ncuos.com/591210216_qq.com/teamup-api:latest
 	docker-compose up -d

@@ -4,4 +4,4 @@ COPY ./user-service /
 
 WORKDIR /
 
-CMD ["/user-service", "--app-id=${APP_ID}", "--app-secret=${APP_SECRET}"]
+CMD ["/user-service"]
