@@ -12,10 +12,10 @@ import (
 var Conn *gorm.DB
 
 func init() {
-	ds := fmt.Sprintf("%s:%s@%s/%s?charset=utf8&parseTime=True&loc=Local",
+	ds := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8&parseTime=True&loc=Local",
 		config.Cfg.Get("db", "username").String(""),
 		config.Cfg.Get("db", "password").String(""),
-		config.Cfg.Get("db", "hosts").String(""),
+		config.Cfg.Get("db", "host").String(""),
 		config.Cfg.Get("db", "database").String(""),
 	)
 
