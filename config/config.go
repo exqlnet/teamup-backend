@@ -11,7 +11,7 @@ import (
 var Cfg config.Config
 
 func init() {
-	Cfg  = config.DefaultConfig
+	Cfg, _  = config.NewConfig()
 	var err error
 
 	var sc source.Source
@@ -33,7 +33,7 @@ func init() {
 	}
 
 	sc = memory.NewSource(memory.WithJSON(cfgData))
-	err = config.Load(sc)
+	err = Cfg.Load(sc)
 
 	if err != nil {
 		log.Fatal(err)
