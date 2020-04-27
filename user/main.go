@@ -7,6 +7,8 @@ import (
 	"log"
 	"os"
 	"teamup/config"
+	"teamup/db"
+	"teamup/db/model"
 	proto "teamup/user/proto"
 	util "teamup/user/util"
 )
@@ -27,12 +29,18 @@ func (us *userServiceImpl) Login(ctx context.Context, req *proto.LoginReq, rsp *
 	}
 
 	// 查询数据库，无此人需要创建
-	userId := int32(1)
+	user := &model.User{}
+	db.Conn.Where("open_id = ?", wechatSession.Openid).First(user)
+	if user.UserID == 0 {
+		user.Openid = wechatSession.Openid
+		user.Avatar = "https://golang.org/lib/godoc/images/footer-gopher.jpg"
+		user.Username = "wx_" + util.Hash(wechatSession.Openid)[:8]
+	}
 
 
 	rsp.Msg = "登录成功"
 	rsp.Code = 0
-	rsp.Token, err = util.GenerateToken(userId, config.Cfg.Get("auth", "secret").String(""))
+	rsp.Token, err = util.GenerateToken(int32(user.UserID), config.Cfg.Get("auth", "secret").String(""))
 	if err != nil {
 		return err
 	}

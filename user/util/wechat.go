@@ -1,6 +1,8 @@
 package util
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -34,4 +36,10 @@ func Code2Session(code string) (*WechatSession, error){
 	body, _ := ioutil.ReadAll(res.Body)
 	_ = json.Unmarshal(body, wechatSession)
 	return wechatSession, nil
+}
+
+func Hash(str string) string {
+	h := sha256.New()
+	h.Write([]byte(str))
+	return hex.EncodeToString(h.Sum(nil))
 }
