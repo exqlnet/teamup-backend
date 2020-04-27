@@ -6,8 +6,11 @@ services:
     environment:
       - APP_ID=wx2edea90ce5cfe2c3
       - APP_SECRET=b89a066ad14330ad714478d74e04d0d8
+      - GO_RUN_MODE=product
   api-gateway:
     image: teamup-api:latest
     restart: always
     ports:
       - 8888:8888
+    environment:
+      - GO_RUN_MODE=product
