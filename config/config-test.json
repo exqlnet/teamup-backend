@@ -9,5 +9,6 @@
     "username": "root",
     "password": "123456",
     "database": "teamup"
-  }
+  },
+  "test": "ok"
 }
