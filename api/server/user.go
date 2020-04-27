@@ -49,9 +49,16 @@ func UserLoginHandler(c *gin.Context) {
 //     "$ref": "#/responses/badReq"
 //   "401":
 //     "$ref": "#/responses/unauthorized"
+//   "404":
+//     "$ref": "#/responses/notFound"
 func UserInfoHandler (c *gin.Context) {
 	userId, _ := c.Get("userId")
-	info, _ := svc.UserServiceClient.GetUserInfo(context.Background(), &userPB.GetUserInfoReq{UserId:userId.(int32)})
-
+	info, err := svc.UserServiceClient.GetUserInfo(context.Background(), &userPB.GetUserInfoReq{UserId:userId.(int32)})
+	if err != nil {
+		c.JSON(404, gin.H{
+			"code": 404,
+			"msg": "user not found",
+		})
+	}
 	c.JSON(200, info)
 }

@@ -2,8 +2,8 @@ package main
 
 import (
 	"context"
-	"github.com/emirpasic/gods/utils"
 	"github.com/micro/go-micro/v2"
+	"github.com/micro/go-micro/v2/errors"
 	"log"
 	"os"
 	"teamup/config"
@@ -12,6 +12,8 @@ import (
 	proto "teamup/user/proto"
 	util "teamup/user/util"
 )
+
+const SVC_NAME  = "go.micro.teamup.svc.user"
 
 type userServiceImpl struct {}
 
@@ -30,7 +32,7 @@ func (us *userServiceImpl) Login(ctx context.Context, req *proto.LoginReq, rsp *
 
 	// 查询数据库，无此人需要创建
 	user := &model.User{}
-	db.Conn.Where("open_id = ?", wechatSession.Openid).First(user)
+	db.Conn.Where("openid = ?", wechatSession.Openid).First(user)
 	if user.UserID == 0 {
 		user.Openid = wechatSession.Openid
 		user.Avatar = "https://golang.org/lib/godoc/images/footer-gopher.jpg"
@@ -48,15 +50,21 @@ func (us *userServiceImpl) Login(ctx context.Context, req *proto.LoginReq, rsp *
 }
 
 func (us *userServiceImpl) GetUserInfo(ctx context.Context, req *proto.GetUserInfoReq, rsp *proto.UserInfo) error {
-	rsp.Username = "user" + utils.ToString(req.UserId)
-	rsp.Avatar = "https://micro.mu/logo.png"
+	log.Println("getting user info of userid : ", req.UserId)
+	user := &model.User{}
+	db.Conn.Where("user_id = ?", req.UserId).First(user)
+	if user.UserID == 0 {
+		return errors.New(SVC_NAME, "user not found", 404)
+	}
+	rsp.Username = user.Username
+	rsp.Avatar = user.Avatar
 	return nil
 }
 
 func main() {
 
 	service := micro.NewService(
-		micro.Name("go.micro.teamup.svc.user"),
+		micro.Name(SVC_NAME),
 	)
 
 	appSecret := os.Getenv("APP_SECRET")
@@ -68,6 +76,8 @@ func main() {
 	config.Cfg.Set(appID, "wechat", "app_id")
 	config.Cfg.Set(appSecret, "wechat", "app_secret")
 
+	println("-----", config.Cfg.Get("env").String(""))
+	println("-----", config.Cfg.Get("db", "host").String("host"))
 	proto.RegisterUserServiceHandler(service.Server(), &userServiceImpl{})
 
 	if err := service.Run(); err != nil {
