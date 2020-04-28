@@ -16,7 +16,7 @@ func main() {
 
 	service := web.NewService(
 		web.Name("go.micro.teamup.api"),
-		web.Address("127.0.0.1:8888"),
+		web.Address("0.0.0.0:8888"),
 	)
 
 	service.Init()
