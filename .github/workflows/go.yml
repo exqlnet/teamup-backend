@@ -22,33 +22,34 @@ jobs:
           git pull origin master
           docker login -u ${{ secrets.DOCKER_UN}} -p ${{ secrets.DOCKER_PW }} registry.ncuos.com
           make build
-  test:
-    name: test
-    needs: [build]
-    runs-on: ubuntu-latest
-    steps:
-    - name: execute test
-      uses: appleboy/ssh-action@master
-      with:
-        host: 120.79.9.56
-        key: ${{ secrets.PRIVATE_KEY }}
-        username: root
-        script: |
-          cd ~/teamup-backend
-          export PATH=$PATH:/usr/local/go/bin
-          make test
-  deploy:
-    name: Deploy
-    needs: [build, test]
-    runs-on: ubuntu-latest
-    steps:
-    - name: deploy application
-      uses: appleboy/ssh-action@master
-      with:
-        host: 120.79.9.56
-        key: ${{ secrets.PRIVATE_KEY }}
-        username: root
-        script: |
-          cd ~/teamup-backend
-          export PATH=$PATH:/usr/local/go/bin
           make deploy
+#  test:
+#    name: test
+#    needs: [build]
+#    runs-on: ubuntu-latest
+#    steps:
+#    - name: execute test
+#      uses: appleboy/ssh-action@master
+#      with:
+#        host: 120.79.9.56
+#        key: ${{ secrets.PRIVATE_KEY }}
+#        username: root
+#        script: |
+#          cd ~/teamup-backend
+#          export PATH=$PATH:/usr/local/go/bin
+#          make test
+#  deploy:
+#    name: Deploy
+#    needs: [build, test]
+#    runs-on: ubuntu-latest
+#    steps:
+#    - name: deploy application
+#      uses: appleboy/ssh-action@master
+#      with:
+#        host: 120.79.9.56
+#        key: ${{ secrets.PRIVATE_KEY }}
+#        username: root
+#        script: |
+#          cd ~/teamup-backend
+#          export PATH=$PATH:/usr/local/go/bin
+#          make deploy
