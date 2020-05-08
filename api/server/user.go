@@ -55,10 +55,11 @@ func UserInfoHandler (c *gin.Context) {
 	userId, _ := c.Get("userId")
 	info, err := svc.UserServiceClient.GetUserInfo(context.Background(), &userPB.GetUserInfoReq{UserId:userId.(int32)})
 	if err != nil {
-		c.JSON(404, gin.H{
-			"code": 404,
-			"msg": "user not found",
+		c.JSON(401, gin.H{
+			"code": 401,
+			"msg": "unauthorized",
 		})
+		return
 	}
 	c.JSON(200, info)
 }

@@ -18,11 +18,25 @@ const SvcName = "go.micro.teamup.svc.user"
 type userServiceImpl struct {}
 
 func (us *userServiceImpl) Login(ctx context.Context, req *proto.LoginReq, rsp *proto.LoginRes) error {
-	wechatSession, err := util.Code2Session(req.Code)
-	if err != nil {
-		log.Println("err: ", err)
-		return err
+	var wechatSession *util.WechatSession
+	var err error
+
+	if config.Cfg.Get("env").String("") == "test" {
+		wechatSession = &util.WechatSession{
+			Openid:     "testopenid",
+			SessionKey: "-",
+			Unionid:    "-",
+			Errcode:    0,
+			Errmsg:     "",
+		}
+	} else {
+		wechatSession, err = util.Code2Session(req.Code)
+		if err != nil {
+			log.Println("err: ", err)
+			return err
+		}
 	}
+
 	if wechatSession.Errcode != 0 {
 		rsp.Code = wechatSession.Errcode
 		rsp.Msg = wechatSession.Errmsg
@@ -38,6 +52,7 @@ func (us *userServiceImpl) Login(ctx context.Context, req *proto.LoginReq, rsp *
 		user.Avatar = "https://golang.org/lib/godoc/images/footer-gopher.jpg"
 		user.Username = "wx_" + util.Hash(wechatSession.Openid)[:8]
 		db.Conn.Save(&user)
+		db.Conn.Where("openid = ?", wechatSession.Openid).First(user)
 	}
 
 	rsp.Msg = "登录成功"
