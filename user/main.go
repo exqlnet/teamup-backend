@@ -13,7 +13,7 @@ import (
 	util "teamup/user/util"
 )
 
-const SVC_NAME  = "go.micro.teamup.svc.user"
+const SvcName = "go.micro.teamup.svc.user"
 
 type userServiceImpl struct {}
 
@@ -37,8 +37,8 @@ func (us *userServiceImpl) Login(ctx context.Context, req *proto.LoginReq, rsp *
 		user.Openid = wechatSession.Openid
 		user.Avatar = "https://golang.org/lib/godoc/images/footer-gopher.jpg"
 		user.Username = "wx_" + util.Hash(wechatSession.Openid)[:8]
+		db.Conn.Save(&user)
 	}
-
 
 	rsp.Msg = "登录成功"
 	rsp.Code = 0
@@ -54,7 +54,7 @@ func (us *userServiceImpl) GetUserInfo(ctx context.Context, req *proto.GetUserIn
 	user := &model.User{}
 	db.Conn.Where("user_id = ?", req.UserId).First(user)
 	if user.UserID == 0 {
-		return errors.New(SVC_NAME, "user not found", 404)
+		return errors.New(SvcName, "user not found", 404)
 	}
 	rsp.Username = user.Username
 	rsp.Avatar = user.Avatar
@@ -64,7 +64,7 @@ func (us *userServiceImpl) GetUserInfo(ctx context.Context, req *proto.GetUserIn
 func main() {
 
 	service := micro.NewService(
-		micro.Name(SVC_NAME),
+		micro.Name(SvcName),
 	)
 
 	appSecret := os.Getenv("APP_SECRET")
