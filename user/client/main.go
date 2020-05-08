@@ -11,7 +11,7 @@ func main() {
 
 	service := micro.NewService()
 
-	userService := teamup_svc_user.NewUserService("go.micro.teamup.svc.userhgj", service.Client())
+	userService := teamup_svc_user.NewUserService("go.micro.teamup.svc.user", service.Client())
 	_, err := userService.GetUserInfo(context.Background(), &teamup_svc_user.GetUserInfoReq{UserId: 1})
 	if err != nil {
 		log.Fatal(err)

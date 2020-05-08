@@ -4,11 +4,11 @@
     "secret": "ncuhomeok~"
   },
   "db": {
-    "host": "127.0.0.1",
+    "host": "120.79.9.56",
     "port": 3306,
     "username": "root",
     "password": "123456",
-    "database": "teamup"
+    "database": "teamup_test"
   },
   "env": "test"
 }

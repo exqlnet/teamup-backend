@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/jinzhu/gorm"
 	"github.com/micro/go-micro/v2"
 	"github.com/micro/go-micro/v2/errors"
 	"log"
@@ -46,12 +47,11 @@ func (us *userServiceImpl) Login(ctx context.Context, req *proto.LoginReq, rsp *
 
 	// 查询数据库，无此人需要创建
 	user := &model.User{}
-	db.Conn.Where("openid = ?", wechatSession.Openid).First(user)
-	if user.UserID == 0 {
+	if err := db.Conn.Where("openid = ?", wechatSession.Openid).First(user).Error; gorm.IsRecordNotFoundError(err) {
 		user.Openid = wechatSession.Openid
 		user.Avatar = "https://golang.org/lib/godoc/images/footer-gopher.jpg"
 		user.Username = "wx_" + util.Hash(wechatSession.Openid)[:8]
-		db.Conn.Save(&user)
+		db.Conn.Save(user)
 		db.Conn.Where("openid = ?", wechatSession.Openid).First(user)
 	}
 

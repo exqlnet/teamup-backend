@@ -4,7 +4,7 @@
         <name><![CDATA[activity]]></name>
         <schema><![CDATA[]]></schema>
         <location>
-            <x>438.00</x>
+            <x>437.00</x>
             <y>462.00</y>
         </location>
         <size>
@@ -16,6 +16,7 @@
             <name><![CDATA[activity_id]]></name>
             <type><![CDATA[INT]]></type>
             <primaryKey>1</primaryKey>
+            <autoIncrement><![CDATA[1]]></autoIncrement>
             <forcedUnique><![CDATA[1]]></forcedUnique>
             <uid><![CDATA[D298585E-23DE-498B-AE78-B422B62499F0]]></uid>
         </SQLField>
@@ -227,6 +228,7 @@
             <name><![CDATA[user_id]]></name>
             <type><![CDATA[INT]]></type>
             <primaryKey>1</primaryKey>
+            <autoIncrement><![CDATA[1]]></autoIncrement>
             <forcedUnique><![CDATA[1]]></forcedUnique>
             <uid><![CDATA[5E32D311-EF54-460D-A18F-F6C59EA723E2]]></uid>
         </SQLField>

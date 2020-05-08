@@ -33,7 +33,7 @@ CREATE TABLE code_authority
 
 CREATE TABLE activity
 (
-    activity_id INT,
+    activity_id INT AUTO_INCREMENT,
     activity_name VARCHAR(128) NOT NULL,
     introduction VARCHAR(1024) NOT NULL,
     creator_id INTEGER NOT NULL,
@@ -70,7 +70,7 @@ CREATE TABLE activity_task_record
 
 CREATE TABLE user
 (
-    user_id INT,
+    user_id INT AUTO_INCREMENT,
     openid VARCHAR(255) NOT NULL,
     username VARCHAR(255) NOT NULL,
     avatar VARCHAR(255) NOT NULL,
