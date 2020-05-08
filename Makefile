@@ -1,6 +1,7 @@
 build:
 	export GOPROXY="https://goproxy.cn"
 	go mod download
+	cd config && make build
 	cd user && make build
 	cd api && make build
 
