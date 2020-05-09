@@ -27,7 +27,10 @@ func (as *ActivityService) DeleteActivity(ctx context.Context, in *activity_pb.I
 	act := &model.Activity{}
 	if err := tx.Table("activity").Where("activity_id = ?", in.Val).First(act).Error; gorm.IsRecordNotFoundError(err) {
 		log.Println(err)
-		return &activity_pb.CommonResp{}, errors.New("activity not found")
+		return &activity_pb.CommonResp{
+			Code:                 status.ActivityNotFound,
+			Msg:                  "activity not found",
+		}, errors.New("activity not found")
 	}
 	act.CurrentProcessID = sql.NullInt64{}
 	tx.Save(act)
@@ -42,7 +45,10 @@ func (as *ActivityService) UpdateActivity(ctx context.Context, in *activity_pb.U
 	tx := db.Conn.Begin()
 	act := &model.Activity{}
 	if err := tx.Table("activity").Where("activity_id = ?", in.ActivityId).First(act).Error; gorm.IsRecordNotFoundError(err) {
-		return &activity_pb.CommonResp{}, errors.New("activity not found")
+		return &activity_pb.CommonResp{
+			Code:                 status.ActivityNotFound,
+			Msg:                  "activity not found",
+		}, errors.New("activity not found")
 	}
 
 	act.Introduction = in.Introduction
@@ -57,7 +63,10 @@ func (as *ActivityService) UpdateActivity(ctx context.Context, in *activity_pb.U
 func (as *ActivityService) CreateTeam(ctx context.Context, in *activity_pb.CreateTeamReq, opts ...client.CallOption) (*activity_pb.CommonResp, error) {
 	act := &model.Activity{}
 	if err := db.Conn.Table("activity").Where("activity_id = ?", in.ActivityId).First(act).Error; gorm.IsRecordNotFoundError(err) {
-		return &activity_pb.CommonResp{}, errors.New("activity not found")
+		return &activity_pb.CommonResp{
+			Code:                 status.ActivityNotFound,
+			Msg:                  "activity not found",
+		}, errors.New("activity not found")
 	}
 
 	team := model.Team{
@@ -70,7 +79,10 @@ func (as *ActivityService) CreateTeam(ctx context.Context, in *activity_pb.Creat
 	err := db.Conn.Save(act).Error
 	if err != nil {
 		log.Println(err)
-		return &activity_pb.CommonResp{}, errors.New("create failed")
+		return &activity_pb.CommonResp{
+			Code:                 status.InternalServerError,
+			Msg:                  "create failed",
+		}, errors.New("create failed")
 	}
 
 	return &activity_pb.CommonResp{
@@ -108,7 +120,10 @@ func (as *ActivityService) GetTeamListByActivityID(ctx context.Context, in *acti
 func (as *ActivityService) DeleteTeam(ctx context.Context, in *activity_pb.IntWrap, opts ...client.CallOption) (*activity_pb.CommonResp, error) {
 	team := &model.Team{}
 	if err := db.Conn.Table("activity_team").Where("team_id = ?", in.Val).First(team).Error; gorm.IsRecordNotFoundError(err) {
-		return &activity_pb.CommonResp{}, errors.New("team not found")
+		return &activity_pb.CommonResp{
+			Code:                 status.TeamNotFound,
+			Msg:                  "team not found",
+		}, errors.New("team not found")
 	}
 
 	db.Conn.Delete(team)
@@ -121,17 +136,26 @@ func (as *ActivityService) DeleteTeam(ctx context.Context, in *activity_pb.IntWr
 func (as *ActivityService) UpdateTeam(ctx context.Context, in *activity_pb.UpdateTeamReq, opts ...client.CallOption) (*activity_pb.CommonResp, error) {
 	team := &model.Team{}
 	if err := db.Conn.Table("activity_team").Where("team_id = ?", in.TeamId).First(team).Error; gorm.IsRecordNotFoundError(err) {
-		return &activity_pb.CommonResp{}, errors.New("team not found")
+		return &activity_pb.CommonResp{
+			Code:                 status.TeamNotFound,
+			Msg:                  "team not found",
+		}, errors.New("team not found")
 	}
 
 	// 检查有无队伍重名
 	var check int
 	if err := db.Conn.Table("activity_team").Where("team_id").Count(&check); err != nil {
 		log.Println(err)
-		return &activity_pb.CommonResp{}, errors.New("error while checking repeated team name")
+		return &activity_pb.CommonResp{
+			Code:                 status.InternalServerError,
+			Msg:                  "",
+		}, errors.New("error while checking repeated team name")
 	}
 	if check > 0 {
-		return &activity_pb.CommonResp{}, errors.New("repeated team name")
+		return &activity_pb.CommonResp{
+			Code:                 status.RepeatedTeamName,
+			Msg:                  "repeated team name",
+		}, errors.New("repeated team name")
 	}
 
 	team.Slogan = in.Slogan
@@ -145,7 +169,7 @@ func (as *ActivityService) UpdateTeam(ctx context.Context, in *activity_pb.Updat
 
 func (as *ActivityService) GetTeamByID(ctx context.Context, in *activity_pb.IntWrap, opts ...client.CallOption) (*activity_pb.Team, error) {
 	team := &model.Team{}
-	if err := db.Conn.Table("activity_team").Where("team_id = ?", in.TeamId).First(team).Error; gorm.IsRecordNotFoundError(err) {
+	if err := db.Conn.Table("activity_team").Where("team_id = ?", in.Val).First(team).Error; gorm.IsRecordNotFoundError(err) {
 		return &activity_pb.Team{}, errors.New("team not found")
 	}
 
