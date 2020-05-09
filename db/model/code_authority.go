@@ -25,8 +25,8 @@ table teamup.code_authority {
 
 // CodeAuthority struct is a row record of the code_authority table in the teamup database
 type CodeAuthority struct {
-	AuthorityCode int
-	Name          string
+	AuthorityCode int    `gorm:"column:authority_code;primary_key"`
+	Name          string `gorm:"column:name"`
 }
 
 // TableName sets the insert table name for this struct type

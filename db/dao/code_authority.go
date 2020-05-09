@@ -3,7 +3,7 @@ package dao
 import (
 	"context"
 
-	"teamup/db/model"
+	"example.com/example/model"
 
 	"github.com/smallnest/gen/dbmeta"
 )

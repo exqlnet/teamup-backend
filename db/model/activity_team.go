@@ -15,7 +15,7 @@ var (
 
 /*
 DB Table Details
-table teamup.team {
+table teamup.activity_team {
 
     [0 ]  team_id                   INT                  nullable: false len: 0
     [1 ]  activity_id               INT                  nullable: false len: 0
@@ -24,15 +24,14 @@ table teamup.team {
 
 */
 
-// Team struct is a row record of the team table in the teamup database
-type Team struct {
+// ActivityTeam struct is a row record of the activity_team table in the teamup database
+type ActivityTeam struct {
 	TeamID     int    `gorm:"column:team_id;primary_key"`
 	ActivityID int    `gorm:"column:activity_id"`
 	TeamName   string `gorm:"column:team_name"`
-	Slogan     string `gorm:"column:slogan"`
 }
 
 // TableName sets the insert table name for this struct type
-func (t *Team) TableName() string {
-	return "team"
+func (a *ActivityTeam) TableName() string {
+	return "activity_team"
 }

@@ -27,10 +27,10 @@ table teamup.team_join {
 
 // TeamJoin struct is a row record of the team_join table in the teamup database
 type TeamJoin struct {
-	TeamJoinID int
-	UserID     int
-	TeamID     int
-	Role       string
+	TeamJoinID int    `gorm:"column:team_join_id;primary_key"`
+	UserID     int    `gorm:"column:user_id"`
+	TeamID     int    `gorm:"column:team_id"`
+	Role       string `gorm:"column:role"`
 }
 
 // TableName sets the insert table name for this struct type

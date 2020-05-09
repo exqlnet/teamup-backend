@@ -17,7 +17,7 @@ var (
 DB Table Details
 table teamup.code_activity_status {
 
-    [0 ]  code                      INT                  nullable: true len: 0
+    [0 ]  code                      INT                  nullable: false len: 0
     [1 ]  name                      VARCHAR              nullable: false len: 0
 }
 
@@ -25,8 +25,8 @@ table teamup.code_activity_status {
 
 // CodeActivityStatus struct is a row record of the code_activity_status table in the teamup database
 type CodeActivityStatus struct {
-	Code sql.NullInt64
-	Name string
+	Code int    `gorm:"column:code;primary_key"`
+	Name string `gorm:"column:name"`
 }
 
 // TableName sets the insert table name for this struct type

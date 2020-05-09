@@ -27,10 +27,13 @@ table teamup.user {
 
 // User struct is a row record of the user table in the teamup database
 type User struct {
-	UserID   int
-	Openid   string
-	Username string
-	Avatar   string
+	UserID   int    `gorm:"column:user_id;primary_key"`
+	Openid   string `gorm:"column:openid"`
+	Username string `gorm:"column:username"`
+	Avatar   string `gorm:"column:avatar"`
+
+	JoinedActivities []Activity `gorm:"many2many:ActivityJoin"`
+	CreatedActivities []Activity `gorm:"foreignkey:CreatorID"`
 }
 
 // TableName sets the insert table name for this struct type

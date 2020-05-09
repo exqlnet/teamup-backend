@@ -25,8 +25,8 @@ table teamup.system_config {
 
 // SystemConfig struct is a row record of the system_config table in the teamup database
 type SystemConfig struct {
-	Key   string
-	Value string
+	Key   string `gorm:"column:key;primary_key"`
+	Value string `gorm:"column:value"`
 }
 
 // TableName sets the insert table name for this struct type

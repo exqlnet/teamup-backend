@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package activity_pb;
+
+message CommonResp {
+    int32 code = 1;
+    string msg = 2;
+}
+
+message IntWrap {
+    int32 val = 1;
+}

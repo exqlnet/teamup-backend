@@ -1,0 +1,133 @@
+syntax = "proto3";
+
+package activity_pb;
+
+import "google/protobuf/empty.proto";
+import "common.proto";
+
+message Activity {
+    int32 activity_id = 1;
+    string activity_name = 2;
+    string introduction = 3;
+    int32 creator_id = 4;
+    string regulation = 5;
+    string roles = 6;
+    string authority = 7;
+    string illustration = 8;
+    string current_process = 9;
+    string status = 10;
+    repeated Process processes = 11;
+}
+
+message ActivityList {
+    repeated Activity activity_list = 1;
+}
+
+message CreateActivityReq {
+    string activity_name = 1;
+    string introduction = 2;
+    string roles = 3;
+    int32 creator_id = 4;
+    string illustration = 5;
+    int32 authority_code = 6;
+    repeated Process processes = 7;
+}
+
+message Process {
+    int32 process_id = 1;
+    string process_name = 2;
+    string start_time = 3;
+    repeated Task tasks = 4;
+}
+
+message Task {
+    int32 task_id = 1;
+    string task_name = 2;
+    string role = 3;
+}
+
+message GetProcessStatusReq {
+    int32 team_id = 1;
+    int32 process_id = 2;
+}
+
+message ActivityJoin {
+    int32 activity_id = 1;
+    string activity_name = 2;
+    string introduction = 3;
+    string status = 10;
+}
+
+message ActivityBrief {
+    int32 activity_id = 1;
+    string activity_name = 2;
+    string start_time = 3;
+    string end_time = 4;
+    string status = 5;
+}
+
+message ActivityBriefList {
+    repeated ActivityBrief activityBriefList = 1;
+}
+
+message ActivityJoinList {
+    int32 total = 1;
+    repeated ActivityJoin activityList = 2;
+}
+
+message UpdateActivityReq {
+    int32 activity_id = 1;
+    string introduction = 2;
+    string illustration = 3;
+}
+
+message CreateTeamReq {
+    int32 activity_id = 1;
+    string team_name = 2;
+    string slogan = 3;
+}
+
+message UpdateTeamReq {
+    int32 team_id = 1;
+    string team_name = 2;
+    string slogan = 3;
+}
+
+message Team {
+    int32 team_id = 1;
+    int32 activity_id = 2;
+    string team_name = 3;
+    string slogan = 4;
+}
+
+message TeamList {
+    int32 total = 1;
+    repeated Team teamList = 2;
+}
+
+service ActivityService {
+    // 发起活动
+    rpc CreateActivity(CreateActivityReq) returns (CommonResp);
+    // 删除活动
+    rpc DeleteActivity(IntWrap) returns (CommonResp);
+    // 更新活动
+    rpc UpdateActivity(UpdateActivityReq) returns (CommonResp);
+    // 获取活动详情
+    rpc GetActivityByID(IntWrap) returns (Activity);
+    // 创建队伍
+    rpc CreateTeam(CreateTeamReq) returns (CommonResp);
+    // activity的所有队伍
+    rpc GetTeamListByActivityID(IntWrap) returns (TeamList);
+    // 删除队伍
+    rpc DeleteTeam(IntWrap) returns (CommonResp);
+    // 更新队伍
+    rpc UpdateTeam(UpdateTeamReq) returns (CommonResp);
+    // 获取队伍
+    rpc GetTeamByID(IntWrap) returns (Team);
+    // 获取已参加的活动（简要）
+    rpc GetActivityJoinByUserID(IntWrap) returns (ActivityJoinList);
+    // 获取发起的活动（简要）
+    rpc GetCreatedActivityByUserID(IntWrap) returns (ActivityBriefList);
+    // 获取热门活动
+    rpc GetHotActivities(google.protobuf.Empty) returns (ActivityList);
+}
