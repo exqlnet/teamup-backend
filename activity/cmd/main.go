@@ -22,33 +22,104 @@ const TimeFormat = "2006-01-02 15:04:05"
 
 type ActivityService struct {}
 
-func (as *ActivityService) DeleteActivity(ctx context.Context, in *activity_pb.IntWrap, opts ...client.CallOption) (*activity_pb.CommonResp, error) {
+func (as *ActivityService) CreateActivity(ctx context.Context, req *activity_pb.CreateActivityReq, rsp *activity_pb.CommonResp) error {
+	tx := db.Conn.Begin()
+	// check request parameters validation
+	// todo
+	activity := &model.Activity{
+		ActivityName:   req.ActivityName,
+		Introduction:   req.Introduction,
+		CreatorID:      int(req.CreatorId),
+		Regulation:     "-",
+		Roles:          req.Roles,
+		AuthorityCode:  int(req.AuthorityCode),
+		Illustration:   req.Illustration,
+		StatusCode:     1,
+		CurrentProcessID: sql.NullInt64{},
+	}
+
+	if len(req.Processes) == 0 {
+		rsp = &activity_pb.CommonResp{
+			Code:                 status.EmptyProcess,
+			Msg:                  "process is empty",
+		}
+		return nil
+	}
+
+	var processes []model.ActivityProcess
+	for _, p := range req.Processes {
+		var t time.Time
+		var err error
+		if t, err = time.Parse("", p.StartTime); err != nil {
+			rsp = &activity_pb.CommonResp{
+				Code:                 status.TimeFormatError,
+				Msg:                  "time format error",
+			}
+			return nil
+		}
+		process := model.ActivityProcess{
+			ProcessName: p.ProcessName,
+			StartTime: t,
+		}
+
+		var tasks []model.ActivityTask
+		for _, t := range p.Tasks {
+			task := model.ActivityTask{
+				TaskName:  t.TaskName,
+				ProcessID: process.ProcessID,
+				Role:      t.Role,
+			}
+			tasks = append(tasks, task)
+		}
+		process.Tasks = tasks
+		processes = append(processes, process)
+	}
+
+	sort.SliceStable(processes, func(i, j int) bool {
+		return processes[i].StartTime.After(processes[j].StartTime)
+	})
+	activity.Processes = processes
+	tx.Create(activity)
+	activity.CurrentProcess = processes[0]
+	tx.Save(activity)
+	tx.Commit()
+	rsp = &activity_pb.CommonResp{
+		Code:                 0,
+		Msg:                  "success",
+	}
+	return nil
+}
+
+func (as *ActivityService) DeleteActivity(ctx context.Context, req *activity_pb.IntWrap, rsp *activity_pb.CommonResp) error {
 	tx := db.Conn.Begin()
 	act := &model.Activity{}
-	if err := tx.Table("activity").Where("activity_id = ?", in.Val).First(act).Error; gorm.IsRecordNotFoundError(err) {
+	if err := tx.Table("activity").Where("activity_id = ?", req.Val).First(act).Error; gorm.IsRecordNotFoundError(err) {
 		log.Println(err)
-		return &activity_pb.CommonResp{
+		rsp = &activity_pb.CommonResp{
 			Code:                 status.ActivityNotFound,
 			Msg:                  "activity not found",
-		}, errors.New("activity not found")
+		}
+		return errors.New("activity not found")
 	}
 	act.CurrentProcessID = sql.NullInt64{}
 	tx.Save(act)
 	tx.Delete(act)
-	return &activity_pb.CommonResp{
+	rsp = &activity_pb.CommonResp{
 		Code: 0,
 		Msg:  "success",
-	}, nil
+	}
+	return nil
 }
 
-func (as *ActivityService) UpdateActivity(ctx context.Context, in *activity_pb.UpdateActivityReq, opts ...client.CallOption) (*activity_pb.CommonResp, error) {
+func (as *ActivityService) UpdateActivity(ctx context.Context, req *activity_pb.UpdateActivityReq, rsp *activity_pb.CommonResp) error {
 	tx := db.Conn.Begin()
 	act := &model.Activity{}
 	if err := tx.Table("activity").Where("activity_id = ?", in.ActivityId).First(act).Error; gorm.IsRecordNotFoundError(err) {
-		return &activity_pb.CommonResp{
+		rsp = &activity_pb.CommonResp{
 			Code:                 status.ActivityNotFound,
 			Msg:                  "activity not found",
-		}, errors.New("activity not found")
+		}
+		return errors.New("activity not found")
 	}
 
 	act.Introduction = in.Introduction
@@ -230,70 +301,7 @@ func (as *ActivityService) GetHotActivities(ctx context.Context, in *empty.Empty
 	panic("implement me")
 }
 
-func (as *ActivityService) CreateActivity(ctx context.Context, in *activity_pb.CreateActivityReq, opts ...client.CallOption) (*activity_pb.CommonResp, error) {
-	tx := db.Conn.Begin()
-	// check request parameters validation
-	// todo
-	activity := &model.Activity{
-		ActivityName:   in.ActivityName,
-		Introduction:   in.Introduction,
-		CreatorID:      int(in.CreatorId),
-		Regulation:     "-",
-		Roles:          in.Roles,
-		AuthorityCode:  int(in.AuthorityCode),
-		Illustration:   in.Illustration,
-		StatusCode:     1,
-		CurrentProcessID: sql.NullInt64{},
-	}
 
-	if len(in.Processes) == 0 {
-		return &activity_pb.CommonResp{
-			Code:                 status.EmptyProcess,
-			Msg:                  "process is empty",
-		}, nil
-	}
-
-	var processes []model.ActivityProcess
-	for _, p := range in.Processes {
-		var t time.Time
-		var err error
-		if t, err = time.Parse("", p.StartTime); err != nil {
-			return &activity_pb.CommonResp{
-				Code:                 status.TimeFormatError,
-				Msg:                  "time format error",
-			}, nil
-		}
-		process := model.ActivityProcess{
-			ProcessName: p.ProcessName,
-			StartTime: t,
-		}
-
-		var tasks []model.ActivityTask
-		for _, t := range p.Tasks {
-			task := model.ActivityTask{
-				TaskName:  t.TaskName,
-				ProcessID: process.ProcessID,
-				Role:      t.Role,
-			}
-			tasks = append(tasks, task)
-		}
-		process.Tasks = tasks
-		processes = append(processes, process)
-	}
-
-	sort.SliceStable(processes, func(i, j int) bool {
-		return processes[i].StartTime.After(processes[j].StartTime)
-	})
-	activity.Processes = processes
-	tx.Create(activity)
-	activity.CurrentProcess = processes[0]
-	tx.Save(activity)
-	tx.Commit()
-	return &activity_pb.CommonResp{
-		Code:                 0,
-		Msg:                  "success",
-	}, nil
-}
 
 func (as *ActivityService) GetActivityByID(ctx context.Context, in *activity_pb.IntWrap, opts ...client.CallOption) (*activity_pb.Activity, error) {
 
@@ -347,6 +355,7 @@ func main() {
 		micro.Name(SvcName),
 	)
 
+	activity_pb.RegisterActivityServiceHandler(service.Server(), &ActivityService{})
 	if err := service.Run(); err != nil {
 		log.Fatal(err)
 	}
