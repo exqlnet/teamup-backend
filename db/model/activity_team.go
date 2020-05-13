@@ -29,6 +29,7 @@ type ActivityTeam struct {
 	TeamID     int    `gorm:"column:team_id;primary_key"`
 	ActivityID int    `gorm:"column:activity_id"`
 	TeamName   string `gorm:"column:team_name"`
+	Slogan string `gorm:"column:slogan"`
 }
 
 // TableName sets the insert table name for this struct type

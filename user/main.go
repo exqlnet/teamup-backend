@@ -1,99 +1,41 @@
 package main
 
 import (
-	"context"
-	"github.com/jinzhu/gorm"
 	"github.com/micro/go-micro/v2"
-	"github.com/micro/go-micro/v2/errors"
 	"log"
 	"os"
 	"teamup/config"
-	"teamup/db"
-	"teamup/db/model"
 	proto "teamup/user/proto"
-	util "teamup/user/util"
+	"teamup/user/svc"
 )
+
 
 const SvcName = "go.micro.teamup.svc.user"
 
-type userServiceImpl struct {}
-
-func (us *userServiceImpl) Login(ctx context.Context, req *proto.LoginReq, rsp *proto.LoginRes) error {
-	var wechatSession *util.WechatSession
-	var err error
-
-	if config.Cfg.Get("env").String("") == "test" {
-		wechatSession = &util.WechatSession{
-			Openid:     "testopenid",
-			SessionKey: "-",
-			Unionid:    "-",
-			Errcode:    0,
-			Errmsg:     "",
-		}
+func init() {
+	if config.Cfg.Get("env").String("") != "product" {
+		config.Cfg.Set("test_app_id", "wechat", "app_id")
+		config.Cfg.Set("test_app_secret", "wechat", "app_secret")
 	} else {
-		wechatSession, err = util.Code2Session(req.Code)
-		if err != nil {
-			log.Println("err: ", err)
-			return err
+		appSecret := os.Getenv("APP_SECRET")
+		appID := os.Getenv("APP_ID")
+		if appSecret == "" || appID == "" {
+			log.Fatal("APP_SECRET or APP_ID is not set")
 		}
+		config.Cfg.Set(appID, "wechat", "app_id")
+		config.Cfg.Set(appSecret, "wechat", "app_secret")
 	}
-
-	if wechatSession.Errcode != 0 {
-		rsp.Code = wechatSession.Errcode
-		rsp.Msg = wechatSession.Errmsg
-		rsp.Token = ""
-		return nil
-	}
-
-	// 查询数据库，无此人需要创建
-	user := &model.User{}
-	if err := db.Conn.Where("openid = ?", wechatSession.Openid).First(user).Error; gorm.IsRecordNotFoundError(err) {
-		user.Openid = wechatSession.Openid
-		user.Avatar = "https://golang.org/lib/godoc/images/footer-gopher.jpg"
-		user.Username = "wx_" + util.Hash(wechatSession.Openid)[:8]
-		db.Conn.Save(user)
-		db.Conn.Where("openid = ?", wechatSession.Openid).First(user)
-	}
-
-	rsp.Msg = "登录成功"
-	rsp.Code = 0
-	rsp.Token, err = util.GenerateToken(int32(user.UserID), config.Cfg.Get("auth", "secret").String(""))
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (us *userServiceImpl) GetUserInfo(ctx context.Context, req *proto.GetUserInfoReq, rsp *proto.UserInfo) error {
-	log.Println("getting user info of userid : ", req.UserId)
-	user := &model.User{}
-	db.Conn.Where("user_id = ?", req.UserId).First(user)
-	if user.UserID == 0 {
-		return errors.New(SvcName, "user not found", 404)
-	}
-	rsp.Username = user.Username
-	rsp.Avatar = user.Avatar
-	return nil
 }
 
 func main() {
 
 	service := micro.NewService(
 		micro.Name(SvcName),
+		micro.Address("127.0.0.1:8999"),
 	)
 
-	appSecret := os.Getenv("APP_SECRET")
-	appID := os.Getenv("APP_ID")
-	if appSecret == "" || appID == "" {
-		log.Fatal("APP_SECRET or APP_ID is not set")
-	}
 	service.Init()
-	config.Cfg.Set(appID, "wechat", "app_id")
-	config.Cfg.Set(appSecret, "wechat", "app_secret")
-
-	println("-----", config.Cfg.Get("env").String(""))
-	println("-----", config.Cfg.Get("db", "host").String("host"))
-	proto.RegisterUserServiceHandler(service.Server(), &userServiceImpl{})
+	proto.RegisterUserServiceHandler(service.Server(), &svc.UserServiceImpl{})
 
 	if err := service.Run(); err != nil {
 		log.Fatal(err)

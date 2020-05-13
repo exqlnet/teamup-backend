@@ -46,13 +46,13 @@ type ActivityService interface {
 	// 发起活动
 	CreateActivity(ctx context.Context, in *CreateActivityReq, opts ...client.CallOption) (*CommonResp, error)
 	// 删除活动
-	DeleteActivity(ctx context.Context, in *IntWrap, opts ...client.CallOption) (*CommonResp, error)
+	DeleteActivity(ctx context.Context, in *IntWrap, opts ...client.CallOption) (*empty.Empty, error)
 	// 更新活动
 	UpdateActivity(ctx context.Context, in *UpdateActivityReq, opts ...client.CallOption) (*CommonResp, error)
 	// 获取活动详情
 	GetActivityByID(ctx context.Context, in *IntWrap, opts ...client.CallOption) (*Activity, error)
 	// 创建队伍
-	CreateTeam(ctx context.Context, in *CreateTeamReq, opts ...client.CallOption) (*CommonResp, error)
+	CreateTeam(ctx context.Context, in *CreateTeamReq, opts ...client.CallOption) (*IntWrap, error)
 	// activity的所有队伍
 	GetTeamListByActivityID(ctx context.Context, in *IntWrap, opts ...client.CallOption) (*TeamList, error)
 	// 删除队伍
@@ -91,9 +91,9 @@ func (c *activityService) CreateActivity(ctx context.Context, in *CreateActivity
 	return out, nil
 }
 
-func (c *activityService) DeleteActivity(ctx context.Context, in *IntWrap, opts ...client.CallOption) (*CommonResp, error) {
+func (c *activityService) DeleteActivity(ctx context.Context, in *IntWrap, opts ...client.CallOption) (*empty.Empty, error) {
 	req := c.c.NewRequest(c.name, "ActivityService.DeleteActivity", in)
-	out := new(CommonResp)
+	out := new(empty.Empty)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
@@ -121,9 +121,9 @@ func (c *activityService) GetActivityByID(ctx context.Context, in *IntWrap, opts
 	return out, nil
 }
 
-func (c *activityService) CreateTeam(ctx context.Context, in *CreateTeamReq, opts ...client.CallOption) (*CommonResp, error) {
+func (c *activityService) CreateTeam(ctx context.Context, in *CreateTeamReq, opts ...client.CallOption) (*IntWrap, error) {
 	req := c.c.NewRequest(c.name, "ActivityService.CreateTeam", in)
-	out := new(CommonResp)
+	out := new(IntWrap)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
@@ -207,13 +207,13 @@ type ActivityServiceHandler interface {
 	// 发起活动
 	CreateActivity(context.Context, *CreateActivityReq, *CommonResp) error
 	// 删除活动
-	DeleteActivity(context.Context, *IntWrap, *CommonResp) error
+	DeleteActivity(context.Context, *IntWrap, *empty.Empty) error
 	// 更新活动
 	UpdateActivity(context.Context, *UpdateActivityReq, *CommonResp) error
 	// 获取活动详情
 	GetActivityByID(context.Context, *IntWrap, *Activity) error
 	// 创建队伍
-	CreateTeam(context.Context, *CreateTeamReq, *CommonResp) error
+	CreateTeam(context.Context, *CreateTeamReq, *IntWrap) error
 	// activity的所有队伍
 	GetTeamListByActivityID(context.Context, *IntWrap, *TeamList) error
 	// 删除队伍
@@ -233,10 +233,10 @@ type ActivityServiceHandler interface {
 func RegisterActivityServiceHandler(s server.Server, hdlr ActivityServiceHandler, opts ...server.HandlerOption) error {
 	type activityService interface {
 		CreateActivity(ctx context.Context, in *CreateActivityReq, out *CommonResp) error
-		DeleteActivity(ctx context.Context, in *IntWrap, out *CommonResp) error
+		DeleteActivity(ctx context.Context, in *IntWrap, out *empty.Empty) error
 		UpdateActivity(ctx context.Context, in *UpdateActivityReq, out *CommonResp) error
 		GetActivityByID(ctx context.Context, in *IntWrap, out *Activity) error
-		CreateTeam(ctx context.Context, in *CreateTeamReq, out *CommonResp) error
+		CreateTeam(ctx context.Context, in *CreateTeamReq, out *IntWrap) error
 		GetTeamListByActivityID(ctx context.Context, in *IntWrap, out *TeamList) error
 		DeleteTeam(ctx context.Context, in *IntWrap, out *CommonResp) error
 		UpdateTeam(ctx context.Context, in *UpdateTeamReq, out *CommonResp) error
@@ -260,7 +260,7 @@ func (h *activityServiceHandler) CreateActivity(ctx context.Context, in *CreateA
 	return h.ActivityServiceHandler.CreateActivity(ctx, in, out)
 }
 
-func (h *activityServiceHandler) DeleteActivity(ctx context.Context, in *IntWrap, out *CommonResp) error {
+func (h *activityServiceHandler) DeleteActivity(ctx context.Context, in *IntWrap, out *empty.Empty) error {
 	return h.ActivityServiceHandler.DeleteActivity(ctx, in, out)
 }
 
@@ -272,7 +272,7 @@ func (h *activityServiceHandler) GetActivityByID(ctx context.Context, in *IntWra
 	return h.ActivityServiceHandler.GetActivityByID(ctx, in, out)
 }
 
-func (h *activityServiceHandler) CreateTeam(ctx context.Context, in *CreateTeamReq, out *CommonResp) error {
+func (h *activityServiceHandler) CreateTeam(ctx context.Context, in *CreateTeamReq, out *IntWrap) error {
 	return h.ActivityServiceHandler.CreateTeam(ctx, in, out)
 }
 

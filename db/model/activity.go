@@ -51,7 +51,8 @@ type Activity struct {
 	StartTime        time.Time     `gorm:"column:start_time;default:CURRENT_TIMESTAMP"`
 	EndTime          time.Time     `gorm:"column:end_time;default:CURRENT_TIMESTAMP"`
 	Processes        []ActivityProcess `gorm:"foreignkey:ActivityID"`
-	Teams			 []Team			`gorm:"foreignkey:ActivityID"`
+	Teams			 []ActivityTeam			`gorm:"foreignkey:ActivityID"`
+	DeletedAt *time.Time `sql:"index"`
 }
 
 // TableName sets the insert table name for this struct type

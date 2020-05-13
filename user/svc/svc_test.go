@@ -16,12 +16,12 @@ func TestGetUserInfo(t *testing.T)  {
 	if err != nil {
 		t.Fatal(err)
 	}
-
+	t.Logf("%v", resp)
 }
 
 func TestLogin(t *testing.T) {
 	cli := teamup_svc_user.NewUserService(name, client.DefaultClient)
-	_, err := teamup_svc_user.Login(context.Background(), &teamup_svc_user.LoginReq{
+	_, err := cli.Login(context.Background(), &teamup_svc_user.LoginReq{
 		Code:                 "ncuhomelaile",
 	})
 

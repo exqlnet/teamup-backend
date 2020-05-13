@@ -1,10 +1,9 @@
-package test
+package util
 
 import (
 	"log"
 	"os"
 	"teamup/config"
-	"teamup/user/util"
 	"testing"
 )
 
@@ -13,12 +12,12 @@ func TestJwt(t *testing.T)  {
 	secret := "ncuhomeok~"
 
 	for _, userId := range userIdList {
-		tokenString, err := util.GenerateToken(userId, secret)
+		tokenString, err := GenerateToken(userId, secret)
 		if err != nil {
 			t.Fatalf("error: %s", err)
 		}
 
-		user, err := util.ParseToken(tokenString, secret)
+		user, err := ParseToken(tokenString, secret)
 		if err != nil {
 			t.Fatalf("error: %s", err)
 		}
@@ -37,7 +36,7 @@ func TestCode2Session(t *testing.T) {
 	if appId == "" || appSecret == "" {
 		log.Fatal("err: unable to read config from env")
 	}
-	ws, err := util.Code2Session("123456")
+	ws, err := Code2Session("123456")
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -31,12 +31,14 @@ message CreateActivityReq {
     string illustration = 5;
     int32 authority_code = 6;
     repeated Process processes = 7;
+    int64 start_time = 8;
+    int64 endTime = 9;
 }
 
 message Process {
     int32 process_id = 1;
     string process_name = 2;
-    string start_time = 3;
+    int64 start_time = 3;
     repeated Task tasks = 4;
 }
 
@@ -109,19 +111,19 @@ service ActivityService {
     // 发起活动
     rpc CreateActivity(CreateActivityReq) returns (CommonResp);
     // 删除活动
-    rpc DeleteActivity(IntWrap) returns (CommonResp);
+    rpc DeleteActivity(IntWrap) returns (google.protobuf.Empty);
     // 更新活动
-    rpc UpdateActivity(UpdateActivityReq) returns (CommonResp);
+    rpc UpdateActivity(UpdateActivityReq) returns (google.protobuf.Empty);
     // 获取活动详情
     rpc GetActivityByID(IntWrap) returns (Activity);
     // 创建队伍
-    rpc CreateTeam(CreateTeamReq) returns (CommonResp);
+    rpc CreateTeam(CreateTeamReq) returns (google.protobuf.Empty);
     // activity的所有队伍
     rpc GetTeamListByActivityID(IntWrap) returns (TeamList);
     // 删除队伍
-    rpc DeleteTeam(IntWrap) returns (CommonResp);
+    rpc DeleteTeam(IntWrap) returns (google.protobuf.Empty);
     // 更新队伍
-    rpc UpdateTeam(UpdateTeamReq) returns (CommonResp);
+    rpc UpdateTeam(UpdateTeamReq) returns (google.protobuf.Empty);
     // 获取队伍
     rpc GetTeamByID(IntWrap) returns (Team);
     // 获取已参加的活动（简要）
