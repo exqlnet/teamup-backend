@@ -103,13 +103,13 @@ func (as *ActivityServiceImpl) UpdateActivity(ctx context.Context, req *activity
 	return nil
 }
 
-func (as *ActivityServiceImpl) CreateTeam(ctx context.Context, req *activity_pb.CreateTeamReq, _ *empty.Empty) error {
+func (as *ActivityServiceImpl) CreateTeam(ctx context.Context, req *activity_pb.CreateTeamReq, rsp *activity_pb.IntWrap) error {
 	act := &model.Activity{}
-	if err := db.Conn.Table("activity").Where("activity_id = ?", req.ActivityId).First(act).Error; gorm.IsRecordNotFoundError(err) {
+	if err := db.Conn.Table("activity").Where("activity_id = ?", req.ActivityId).Preload("Teams").First(act).Error; gorm.IsRecordNotFoundError(err) {
 		return status.NewError(status.ActivityNotFound, "activity not found")
 	}
 
-	team := model.ActivityTeam{
+	team := &model.ActivityTeam{
 		ActivityID: int(req.ActivityId),
 		TeamName:   req.TeamName,
 		Slogan:     req.Slogan,
@@ -122,6 +122,7 @@ func (as *ActivityServiceImpl) CreateTeam(ctx context.Context, req *activity_pb.
 		return status.NewError(status.InternalServerError, "create failed")
 	}
 
+	rsp.Val = int32(team.TeamID)
 	return nil
 }
 
@@ -150,49 +151,41 @@ func (as *ActivityServiceImpl) GetTeamListByActivityID(ctx context.Context, req 
 	return nil
 }
 
-func (as *ActivityServiceImpl) DeleteTeam(ctx context.Context, req *activity_pb.IntWrap, rsp *activity_pb.CommonResp) error {
+func (as *ActivityServiceImpl) DeleteTeam(ctx context.Context, req *activity_pb.IntWrap, _ *empty.Empty) error {
 	team := &model.ActivityTeam{}
 	if err := db.Conn.Table("activity_team").Where("team_id = ?", req.Val).First(team).Error; gorm.IsRecordNotFoundError(err) {
-		rsp.Code = status.TeamNotFound
-		rsp.Msg = "team not found"
+		return status.NewError(status.TeamNotFound, "team not found")
 	}
 
 	db.Conn.Delete(team)
 
-	rsp.Code = 0
-	rsp.Msg = "success"
 	return nil
 }
 
-func (as *ActivityServiceImpl) UpdateTeam(ctx context.Context, req *activity_pb.UpdateTeamReq, rsp *activity_pb.CommonResp) error {
+func (as *ActivityServiceImpl) UpdateTeam(ctx context.Context, req *activity_pb.UpdateTeamReq, _ *empty.Empty) error {
 	team := &model.ActivityTeam{}
 	if err := db.Conn.Table("activity_team").Where("team_id = ?", req.TeamId).First(team).Error; gorm.IsRecordNotFoundError(err) {
-		rsp.Code = status.TeamNotFound
-		rsp.Msg = "team not found"
-		return errors.New("team not found")
+		return status.NewError(status.TeamNotFound, "team not found")
+	}
+	if team.TeamName == req.TeamName {
+		return nil
 	}
 
 	// 检查有无队伍重名
 	var check int
-	if err := db.Conn.Table("activity_team").Where("team_id").Count(&check); err != nil {
-		log.Println(err)
-		rsp.Code = status.InternalServerError
-		rsp.Msg = "InternalServerError"
+	if err := db.Conn.Table("activity_team").Where("team_name = ?", req.TeamName).Count(&check).Error; err != nil {
+		log.Printf("%v", err)
 		return errors.New("error while checking repeated team name")
 	}
 
 	if check > 0 {
-		rsp.Code = status.RepeatedTeamName
-		rsp.Msg = "repeated team name"
-		return errors.New("repeated team name")
+		return status.NewError(status.RepeatedTeamName, "repeated team name")
 	}
 
 	team.Slogan = req.Slogan
 	team.TeamName = req.TeamName
 	db.Conn.Save(team)
 
-	rsp.Code = 0
-	rsp.Msg = "success"
 	return nil
 }
 
@@ -202,7 +195,7 @@ func (as *ActivityServiceImpl) GetTeamByID(ctx context.Context, req *activity_pb
 		return errors.New("team not found")
 	}
 
-	rsp = &activity_pb.Team{
+	*rsp = activity_pb.Team{
 		TeamId:               int32(team.TeamID),
 		ActivityId:           int32(team.ActivityID),
 		TeamName:             team.TeamName,
@@ -214,11 +207,11 @@ func (as *ActivityServiceImpl) GetTeamByID(ctx context.Context, req *activity_pb
 
 func (as *ActivityServiceImpl) GetActivityJoinByUserID(ctx context.Context, req *activity_pb.IntWrap, rsp *activity_pb.ActivityJoinList) error {
 	user := &model.User{}
-	if err := db.Conn.Table("user").Where("user_id = ?", req.Val).First(user).Error; gorm.IsRecordNotFoundError(err) {
+	if err := db.Conn.Table("user").Where("user_id = ?", req.Val).Preload("JoinedActivities").First(user).Error; gorm.IsRecordNotFoundError(err) {
 		return errors.New("user not found")
 	}
 
-	rsp = &activity_pb.ActivityJoinList{
+	*rsp = activity_pb.ActivityJoinList{
 		Total:                0,
 		ActivityList: func() []*activity_pb.ActivityJoin{
 			var list []*activity_pb.ActivityJoin
@@ -238,10 +231,10 @@ func (as *ActivityServiceImpl) GetActivityJoinByUserID(ctx context.Context, req 
 
 func (as *ActivityServiceImpl) GetCreatedActivityByUserID(ctx context.Context, req *activity_pb.IntWrap, rsp *activity_pb.ActivityBriefList) error {
 	user := &model.User{}
-	if err := db.Conn.Table("user").Where("user_id = ?", req.Val).First(user).Error; gorm.IsRecordNotFoundError(err) {
+	if err := db.Conn.Table("user").Where("user_id = ?", req.Val).Preload("CreatedActivities").First(user).Error; gorm.IsRecordNotFoundError(err) {
 		return errors.New("user not found")
 	}
-	rsp = &activity_pb.ActivityBriefList{
+	*rsp = activity_pb.ActivityBriefList{
 		ActivityBriefList: func() []*activity_pb.ActivityBrief{
 			var list []*activity_pb.ActivityBrief
 			for _, act := range user.CreatedActivities {

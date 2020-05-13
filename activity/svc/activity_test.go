@@ -99,20 +99,27 @@ func TestUpdateActivity(t *testing.T)  {
 }
 
 func TestCreateTeam(t *testing.T)  {
+	teamID := &activity_pb.IntWrap{}
 	err := cli.CreateTeam(context.Background(), &activity_pb.CreateTeamReq{
-		ActivityId:           1,
+		ActivityId:int32(1),
 		TeamName:             "Best Team",
 		Slogan:               "Very Good",
-	}, &empty.Empty{})
+	}, teamID)
 
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	if teamID.Val < 1 {
+		t.Fatal("create failed")
+	}
+
 }
 
 func TestGetTeamListByActivityID(t *testing.T)  {
+	var err error
 	actList := &activity_pb.TeamList{}
-	err := cli.GetTeamListByActivityID(context.Background(), &activity_pb.IntWrap{Val: int32(1)}, actList)
+	err = cli.GetTeamListByActivityID(context.Background(), &activity_pb.IntWrap{Val: 1}, actList)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -122,3 +129,74 @@ func TestGetTeamListByActivityID(t *testing.T)  {
 	t.Logf("team size: %d", len(actList.TeamList))
 }
 
+func TestDeleteTeam(t *testing.T)  {
+	teamID := &activity_pb.IntWrap{}
+	var err error
+	err = cli.CreateTeam(context.Background(), &activity_pb.CreateTeamReq{
+		ActivityId:int32(1),
+		TeamName:             "Best Team",
+		Slogan:               "Very Good",
+	}, teamID)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Logf("team id: %d", teamID.Val)
+	err = cli.DeleteTeam(context.Background(), &activity_pb.IntWrap{Val: teamID.Val}, &empty.Empty{})
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestUpdateTeam(t *testing.T)  {
+	req := &activity_pb.UpdateTeamReq{
+		TeamId:               1,
+		TeamName:             "修改版老八冠军队",
+		Slogan:               "奥力给！！！",
+	}
+
+	err := cli.UpdateTeam(context.Background(), req, &empty.Empty{})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+}
+
+func TestGetTeamByID(t *testing.T)  {
+	team := &activity_pb.Team{}
+	err := cli.GetTeamByID(context.Background(), &activity_pb.IntWrap{Val: int32(1)}, team)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Logf("team_id=%d, team_name=%s", team.TeamId, team.TeamName)
+}
+
+func TestGetActivityJoinByUserID(t *testing.T)  {
+	joinList := &activity_pb.ActivityJoinList{}
+	err := cli.GetActivityJoinByUserID(context.Background(), &activity_pb.IntWrap{Val: int32(1)}, joinList)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(joinList.ActivityList) < 1 {
+		t.Fatal("result size < 1")
+	}
+	t.Logf("joinList size: %d", len(joinList.ActivityList))
+	t.Logf("first el is: %d %s", joinList.ActivityList[0].ActivityId, joinList.ActivityList[0].ActivityName)
+}
+
+func TestGetCreatedActivityByUserID(t *testing.T)  {
+	list := &activity_pb.ActivityBriefList{}
+	err := cli.GetCreatedActivityByUserID(context.Background(), &activity_pb.IntWrap{Val: int32(1)}, list)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(list.ActivityBriefList) < 1 {
+		t.Fatal("result size < 1")
+	}
+
+	t.Logf("list size: %d", len(list.ActivityBriefList))
+	t.Logf("first el is: %d %s", list.ActivityBriefList[0].ActivityId, list.ActivityBriefList[0].ActivityName)
+}

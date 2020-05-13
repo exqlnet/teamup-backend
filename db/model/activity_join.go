@@ -25,7 +25,7 @@ table teamup.activity_join {
 
 // ActivityJoin struct is a row record of the activity_join table in the teamup database
 type ActivityJoin struct {
-	UserID     int `gorm:"column:user_id;primary_key"`
+	UserID     int `gorm:"column:user_id;"`
 	ActivityID int `gorm:"column:activity_id"`
 }
 

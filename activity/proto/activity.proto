@@ -117,7 +117,7 @@ service ActivityService {
     // 获取活动详情
     rpc GetActivityByID(IntWrap) returns (Activity);
     // 创建队伍
-    rpc CreateTeam(CreateTeamReq) returns (google.protobuf.Empty);
+    rpc CreateTeam(CreateTeamReq) returns (IntWrap);
     // activity的所有队伍
     rpc GetTeamListByActivityID(IntWrap) returns (TeamList);
     // 删除队伍

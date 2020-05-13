@@ -7,6 +7,7 @@ truncate table activity;
 truncate table code_authority;
 truncate table code_activity_status;
 truncate table activity_team;
+truncate table activity_join;
 insert into code_activity_status (code, name) values (1, '未开始'), (2, '进行中'), (3, '已结束');
 
 insert into code_authority (authority_code, name) values (1, '公开'), (2, '受邀请');
@@ -20,5 +21,8 @@ values (1, '吃屎大赛', '活动介绍', 1, '-', '吃屎头领,吃屎队员', 
 insert into activity_process (process_id, process_name, activity_id) values (1, '粑粑生产', 1);
 
 insert into activity_team (activity_id, team_name, slogan) values (1, '老八冠军队', 'Very Good');
+
+# 参加记录
+insert into activity_join values (1, 1);
 
 SET FOREIGN_KEY_CHECKS = 1;

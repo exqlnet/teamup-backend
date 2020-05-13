@@ -48,7 +48,7 @@ type ActivityService interface {
 	// 删除活动
 	DeleteActivity(ctx context.Context, in *IntWrap, opts ...client.CallOption) (*empty.Empty, error)
 	// 更新活动
-	UpdateActivity(ctx context.Context, in *UpdateActivityReq, opts ...client.CallOption) (*CommonResp, error)
+	UpdateActivity(ctx context.Context, in *UpdateActivityReq, opts ...client.CallOption) (*empty.Empty, error)
 	// 获取活动详情
 	GetActivityByID(ctx context.Context, in *IntWrap, opts ...client.CallOption) (*Activity, error)
 	// 创建队伍
@@ -56,9 +56,9 @@ type ActivityService interface {
 	// activity的所有队伍
 	GetTeamListByActivityID(ctx context.Context, in *IntWrap, opts ...client.CallOption) (*TeamList, error)
 	// 删除队伍
-	DeleteTeam(ctx context.Context, in *IntWrap, opts ...client.CallOption) (*CommonResp, error)
+	DeleteTeam(ctx context.Context, in *IntWrap, opts ...client.CallOption) (*empty.Empty, error)
 	// 更新队伍
-	UpdateTeam(ctx context.Context, in *UpdateTeamReq, opts ...client.CallOption) (*CommonResp, error)
+	UpdateTeam(ctx context.Context, in *UpdateTeamReq, opts ...client.CallOption) (*empty.Empty, error)
 	// 获取队伍
 	GetTeamByID(ctx context.Context, in *IntWrap, opts ...client.CallOption) (*Team, error)
 	// 获取已参加的活动（简要）
@@ -101,9 +101,9 @@ func (c *activityService) DeleteActivity(ctx context.Context, in *IntWrap, opts 
 	return out, nil
 }
 
-func (c *activityService) UpdateActivity(ctx context.Context, in *UpdateActivityReq, opts ...client.CallOption) (*CommonResp, error) {
+func (c *activityService) UpdateActivity(ctx context.Context, in *UpdateActivityReq, opts ...client.CallOption) (*empty.Empty, error) {
 	req := c.c.NewRequest(c.name, "ActivityService.UpdateActivity", in)
-	out := new(CommonResp)
+	out := new(empty.Empty)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
@@ -141,9 +141,9 @@ func (c *activityService) GetTeamListByActivityID(ctx context.Context, in *IntWr
 	return out, nil
 }
 
-func (c *activityService) DeleteTeam(ctx context.Context, in *IntWrap, opts ...client.CallOption) (*CommonResp, error) {
+func (c *activityService) DeleteTeam(ctx context.Context, in *IntWrap, opts ...client.CallOption) (*empty.Empty, error) {
 	req := c.c.NewRequest(c.name, "ActivityService.DeleteTeam", in)
-	out := new(CommonResp)
+	out := new(empty.Empty)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
@@ -151,9 +151,9 @@ func (c *activityService) DeleteTeam(ctx context.Context, in *IntWrap, opts ...c
 	return out, nil
 }
 
-func (c *activityService) UpdateTeam(ctx context.Context, in *UpdateTeamReq, opts ...client.CallOption) (*CommonResp, error) {
+func (c *activityService) UpdateTeam(ctx context.Context, in *UpdateTeamReq, opts ...client.CallOption) (*empty.Empty, error) {
 	req := c.c.NewRequest(c.name, "ActivityService.UpdateTeam", in)
-	out := new(CommonResp)
+	out := new(empty.Empty)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
@@ -209,7 +209,7 @@ type ActivityServiceHandler interface {
 	// 删除活动
 	DeleteActivity(context.Context, *IntWrap, *empty.Empty) error
 	// 更新活动
-	UpdateActivity(context.Context, *UpdateActivityReq, *CommonResp) error
+	UpdateActivity(context.Context, *UpdateActivityReq, *empty.Empty) error
 	// 获取活动详情
 	GetActivityByID(context.Context, *IntWrap, *Activity) error
 	// 创建队伍
@@ -217,9 +217,9 @@ type ActivityServiceHandler interface {
 	// activity的所有队伍
 	GetTeamListByActivityID(context.Context, *IntWrap, *TeamList) error
 	// 删除队伍
-	DeleteTeam(context.Context, *IntWrap, *CommonResp) error
+	DeleteTeam(context.Context, *IntWrap, *empty.Empty) error
 	// 更新队伍
-	UpdateTeam(context.Context, *UpdateTeamReq, *CommonResp) error
+	UpdateTeam(context.Context, *UpdateTeamReq, *empty.Empty) error
 	// 获取队伍
 	GetTeamByID(context.Context, *IntWrap, *Team) error
 	// 获取已参加的活动（简要）
@@ -234,12 +234,12 @@ func RegisterActivityServiceHandler(s server.Server, hdlr ActivityServiceHandler
 	type activityService interface {
 		CreateActivity(ctx context.Context, in *CreateActivityReq, out *CommonResp) error
 		DeleteActivity(ctx context.Context, in *IntWrap, out *empty.Empty) error
-		UpdateActivity(ctx context.Context, in *UpdateActivityReq, out *CommonResp) error
+		UpdateActivity(ctx context.Context, in *UpdateActivityReq, out *empty.Empty) error
 		GetActivityByID(ctx context.Context, in *IntWrap, out *Activity) error
 		CreateTeam(ctx context.Context, in *CreateTeamReq, out *IntWrap) error
 		GetTeamListByActivityID(ctx context.Context, in *IntWrap, out *TeamList) error
-		DeleteTeam(ctx context.Context, in *IntWrap, out *CommonResp) error
-		UpdateTeam(ctx context.Context, in *UpdateTeamReq, out *CommonResp) error
+		DeleteTeam(ctx context.Context, in *IntWrap, out *empty.Empty) error
+		UpdateTeam(ctx context.Context, in *UpdateTeamReq, out *empty.Empty) error
 		GetTeamByID(ctx context.Context, in *IntWrap, out *Team) error
 		GetActivityJoinByUserID(ctx context.Context, in *IntWrap, out *ActivityJoinList) error
 		GetCreatedActivityByUserID(ctx context.Context, in *IntWrap, out *ActivityBriefList) error
@@ -264,7 +264,7 @@ func (h *activityServiceHandler) DeleteActivity(ctx context.Context, in *IntWrap
 	return h.ActivityServiceHandler.DeleteActivity(ctx, in, out)
 }
 
-func (h *activityServiceHandler) UpdateActivity(ctx context.Context, in *UpdateActivityReq, out *CommonResp) error {
+func (h *activityServiceHandler) UpdateActivity(ctx context.Context, in *UpdateActivityReq, out *empty.Empty) error {
 	return h.ActivityServiceHandler.UpdateActivity(ctx, in, out)
 }
 
@@ -280,11 +280,11 @@ func (h *activityServiceHandler) GetTeamListByActivityID(ctx context.Context, in
 	return h.ActivityServiceHandler.GetTeamListByActivityID(ctx, in, out)
 }
 
-func (h *activityServiceHandler) DeleteTeam(ctx context.Context, in *IntWrap, out *CommonResp) error {
+func (h *activityServiceHandler) DeleteTeam(ctx context.Context, in *IntWrap, out *empty.Empty) error {
 	return h.ActivityServiceHandler.DeleteTeam(ctx, in, out)
 }
 
-func (h *activityServiceHandler) UpdateTeam(ctx context.Context, in *UpdateTeamReq, out *CommonResp) error {
+func (h *activityServiceHandler) UpdateTeam(ctx context.Context, in *UpdateTeamReq, out *empty.Empty) error {
 	return h.ActivityServiceHandler.UpdateTeam(ctx, in, out)
 }
 
