@@ -8,20 +8,7 @@ import (
 	userPB "teamup/user/proto"
 )
 
-// swagger:operation POST /user/login user login
-// ---
-// summary: 用微信授权码登陆
-// parameters:
-// - name: code
-//   in: path
-//   description: 微信授权码
-//   type: string
-//   required: true
-// responses:
-//   "200":
-//     "$ref": "#/responses/userLoginResp"
-//   "400":
-//     "$ref": "#/responses/badReq"
+
 func UserLoginHandler(c *gin.Context) {
 	params := make(map[string]string)
 	if err := c.BindJSON(&params); err != nil {
@@ -52,7 +39,7 @@ func UserLoginHandler(c *gin.Context) {
 //   "404":
 //     "$ref": "#/responses/notFound"
 func UserInfoHandler (c *gin.Context) {
-	userId, _ := c.Get("userId")
+	userId, _ := c.Get("userID")
 	info, err := svc.UserServiceClient.GetUserInfo(context.Background(), &userPB.GetUserInfoReq{UserId:userId.(int32)})
 	if err != nil {
 		log.Printf("%v", err)

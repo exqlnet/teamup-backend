@@ -25,7 +25,7 @@ func LoginRequired(c *gin.Context) {
 		return
 	}
 
-	c.Set("userId", userId)
+	c.Set("userID", userId)
 }
 
 

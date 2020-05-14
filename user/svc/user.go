@@ -21,7 +21,7 @@ func (us *UserServiceImpl) Login(ctx context.Context, req *proto.LoginReq, rsp *
 
 	if config.Cfg.Get("env").String("") != "product" {
 		wechatSession = &util.WechatSession{
-			Openid:     "testopenid",
+			Openid:     "testopenidid",
 			SessionKey: "-",
 			Unionid:    "-",
 			Errcode:    0,

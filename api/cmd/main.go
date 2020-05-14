@@ -26,8 +26,18 @@ func main() {
 	userRouter.GET("/info", filter.LoginRequired, server.UserInfoHandler)
 	userRouter.POST("/login", server.UserLoginHandler)
 
-	actRouter := router.Group("/api/v1/activity")
-	actRouter.POST("", filter.LoginRequired, server.ActivityCreateHandler)
+	actRouter := router.Group("/api/v1/activity", filter.LoginRequired)
+	actRouter.POST("", server.ActivityCreateHandler)
+	actRouter.DELETE("", server.DeleteActivityHandler)
+	actRouter.GET("", server.GetActivityDetailByIDHandler)
+	actRouter.PUT("", server.UpdateActivityHandler)
+	actRouter.GET("/hot", server.GetHotActivityListHandler)
+	actRouter.GET("/joined", server.GetJoinedActivityHandler)
+	actRouter.GET("/created", server.GetCreatedActivityHandler)
+	actRouter.GET("/teams", server.GetTeamListByActivityIDHandler)
+	actRouter.POST("/team", server.CreateTeamHandler)
+	actRouter.GET("/team", server.GetTeamByIDHandler)
+
 
 	// swagger 接口文档
 	staticFS, err := fs.New()
