@@ -85,6 +85,162 @@ paths:
           $ref: '#/responses/badReq'
         '401':
           $ref: '#/responses/unauthorized'
+    get:
+      summary: 获取某个活动的详情
+      tags:
+        - activity
+      parameters:
+        - name: activity_id
+          in: query
+          type: integer
+      responses:
+        '200':
+          description: ""
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+              msg:
+                type: string
+              data:
+                $ref: '#/definitions/Activity'
+    put:
+      summary: 更新活动（创建者）
+      tags:
+        - activity
+      parameters:
+        - name: activity
+          in: body
+          schema:
+            type: object
+            properties:
+              activity_id:
+                type: integer
+              introduction:
+                type: string
+
+
+      responses:
+        '200':
+          $ref: '#/responses/Success'
+    delete:
+      summary: 删除一个活动（创建者）
+      tags:
+        - activity
+      parameters:
+        - name: activity_id
+          in: body
+          schema:
+            type: object
+            properties:
+              activity_id:
+                type: integer
+      responses:
+        '200':
+          $ref: '#/responses/Success'
+  /activity/team:
+    post:
+      summary: 创建一个队伍
+      tags:
+        - team
+      parameters:
+        - name: team
+          in: body
+          schema:
+            type: object
+            properties:
+              activity_id:
+                description: 活动ID
+                type: integer
+              team_name:
+                description: 队伍名
+                type: string
+              slogan:
+                description: 队伍slogan
+                type: string
+      responses:
+        '200':
+          $ref: '#/responses/Success'
+    get:
+      summary: 获取某个队伍的详细信息
+      tags:
+        - team
+      parameters:
+        - name: team_id
+          in: query
+          type: integer
+      responses:
+        '200':
+          description: 成功
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+              msg:
+                type: string
+              data:
+                type: array
+                items:
+                  $ref: "#/definitions/Team"
+  /activity/teams:
+    get:
+      tags:
+        - team
+      summary: 获取某个活动的所有队伍（后续可能会提供分页查）
+      responses:
+        '200':
+          description: 成功
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+              msg:
+                type: string
+              data:
+                type: array
+                items:
+                  $ref: '#/definitions/Team'
+  /activity/created:
+    get:
+      tags:
+        - activity
+      summary: 获取用户创建的所有活动
+      responses:
+        '200':
+          description: 成功
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+              msg:
+                type: string
+              data:
+                type: array
+                items:
+                  $ref: '#/definitions/Activity'
+  /activity/joined:
+    get:
+      tags:
+        - activity
+      summary: 获取用户已经加入的所有活动
+      responses:
+        '200':
+          description: 成功
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+              msg:
+                type: string
+              data:
+                type: array
+                items:
+                  $ref: '#/definitions/Activity'
   /user/info:
     get:
       tags:
@@ -205,7 +361,18 @@ definitions:
       role:
         type: string
         description: 该任务属于哪个角色
-
+  Team:
+    description: 活动队伍
+    type: object
+    properties:
+      team_id:
+        type: integer
+      activity_id:
+        type: integer
+      team_name:
+        type: string
+      slogan:
+        type: string
 responses:
   badReq:
     description: Error Bad Request
@@ -291,7 +458,7 @@ responses:
           description: Detailed error message
           type: string
           x-go-name: Message
-  ok:
+  Success:
     description: Success response
     schema:
       type: object
@@ -301,6 +468,9 @@ responses:
           type: integer
           format: int64
           x-go-name: Code
+        msg:
+          type: string
+          default: 0
   unauthorized:
     description: Error unauthorized
     schema:
