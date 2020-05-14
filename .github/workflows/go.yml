@@ -18,7 +18,7 @@ jobs:
         username: root
         script: |
           cd ~/teamup-backend
-          export PATH=$PATH:/usr/local/go/bin
+          export PATH=$PATH:/usr/local/go/bin:/root/go/bin
           git pull origin master
           docker login -u ${{ secrets.DOCKER_UN}} -p ${{ secrets.DOCKER_PW }} registry.ncuos.com
           make build
