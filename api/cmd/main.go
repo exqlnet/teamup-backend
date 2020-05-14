@@ -26,6 +26,9 @@ func main() {
 	userRouter.GET("/info", filter.LoginRequired, server.UserInfoHandler)
 	userRouter.POST("/login", server.UserLoginHandler)
 
+	actRouter := router.Group("/api/v1/activity")
+	actRouter.POST("", filter.LoginRequired, server.ActivityCreateHandler)
+
 	// swagger 接口文档
 	staticFS, err := fs.New()
 	if err != nil {

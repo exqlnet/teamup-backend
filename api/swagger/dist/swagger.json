@@ -10,8 +10,8 @@
   ],
   "swagger": "2.0",
   "info": {
-    "description": "This documentation describes example APIs found under https://golang-swaggerui-example",
-    "title": "Golang SwaggerUI example",
+    "description": "Teamup backend API documentation",
+    "title": "Teamup backend API documentation",
     "contact": {
       "email": "exqlnet@gmail.com"
     },
@@ -21,8 +21,52 @@
     },
     "version": "1.0.0"
   },
-  "basePath": "/v1",
+  "basePath": "/api/v1",
   "paths": {
+    "/activity": {
+      "post": {
+        "tags": [
+          "activity"
+        ],
+        "summary": "发布活动",
+        "operationId": "createActivity",
+        "parameters": [
+          {
+            "description": "活动名",
+            "name": "activity_name",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32",
+                  "x-go-name": "Code"
+                }
+              }
+            }
+          },
+          {
+            "description": "认证（token格式：Bearer <token>）",
+            "type": "string",
+            "name": "Authorization",
+            "in": "header"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/activityCreateResp"
+          },
+          "400": {
+            "$ref": "#/responses/badReq"
+          },
+          "401": {
+            "$ref": "#/responses/unauthorized"
+          }
+        }
+      }
+    },
     "/user/info": {
       "get": {
         "tags": [
@@ -103,6 +147,95 @@
         }
       },
       "x-go-package": "teamup/api/swagger"
+    },
+    "Activity": {
+      "description": "活动",
+      "type": "object",
+      "properties": {
+        "activity_id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "activity_name": {
+          "type": "string"
+        },
+        "introduction": {
+          "type": "string"
+        },
+        "creator_id": {
+          "description": "创建者用户ID",
+          "type": "string"
+        },
+        "regulation": {
+          "type": "string",
+          "description": "活动规则"
+        },
+        "roles": {
+          "type": "array",
+          "description": "活动角色",
+          "items": {
+            "type": "string",
+            "description": "角色名"
+          }
+        },
+        "authority": {
+          "type": "string"
+        },
+        "illustration": {
+          "type": "string"
+        },
+        "current_process": {
+          "type": "string",
+          "description": "现在到了哪个流程"
+        },
+        "status": {
+          "type": "string",
+          "description": "当前进行状态"
+        },
+        "processes": {
+          "type": "array",
+          "description": "流程列表",
+          "items": {
+            "$ref": "#/definitions/ActivityProcess"
+          }
+        }
+      }
+    },
+    "ActivityProcess": {
+      "description": "活动流程",
+      "type": "object",
+      "properties": {
+        "process_id": {
+          "type": "string"
+        },
+        "process_name": {
+          "type": "string"
+        },
+        "start_time": {
+          "type": "integer",
+          "format": "int64",
+          "description": "开始时间(unix)"
+        },
+        "tasks": {
+          "$ref": "#/definitions/ActivityTask"
+        }
+      }
+    },
+    "ActivityTask": {
+      "description": "活动流程中的任务",
+      "type": "object",
+      "properties": {
+        "task_name": {
+          "type": "string"
+        },
+        "task_id": {
+          "type": "integer"
+        },
+        "role": {
+          "type": "string",
+          "description": "该任务属于哪个角色"
+        }
+      }
     }
   },
   "responses": {
@@ -268,9 +401,6 @@
             "$ref": "#/definitions/UserInfo"
           }
         }
-      },
-      "headers": {
-        "Body": {}
       }
     },
     "userLoginResp": {
@@ -287,9 +417,23 @@
             "$ref": "#/definitions/AuthToken"
           }
         }
-      },
-      "headers": {
-        "Body": {}
+      }
+    },
+    "activityCreateResp": {
+      "description": "活动创建响应",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/definitions/Activity"
+          }
+        }
       }
     }
   },
