@@ -19,3 +19,7 @@ bin/
 api/swagger/*
 config/bindata.go
 .DS_Store
+
+user-service
+api-server
+activity-service
