@@ -9,7 +9,7 @@ import (
 	"log"
 	"sort"
 	activity_pb "teamup/activity/proto"
-	"teamup/activity/status"
+	"teamup/common"
 	"teamup/db"
 	"teamup/db/model"
 	"time"
@@ -38,7 +38,7 @@ func (as *ActivityServiceImpl) CreateActivity(ctx context.Context, req *activity
 	}
 
 	if len(req.Processes) == 0 {
-		return status.NewError(status.EmptyProcess, "流程为空")
+		return common.NewError(common.EmptyProcess, "流程为空")
 	}
 
 	var processes []model.ActivityProcess
@@ -75,12 +75,12 @@ func (as *ActivityServiceImpl) CreateActivity(ctx context.Context, req *activity
 	return nil
 }
 
-func (as *ActivityServiceImpl) DeleteActivity(ctx context.Context, req *activity_pb.IntWrap, _ empty.Empty) error {
+func (as *ActivityServiceImpl) DeleteActivity(ctx context.Context, req *activity_pb.IntWrap, _ *empty.Empty) error {
 	tx := db.Conn.Begin()
 	act := &model.Activity{}
 	if err := tx.Table("activity").Where("activity_id = ?", req.Val).First(act).Error; gorm.IsRecordNotFoundError(err) {
 		log.Println(err)
-		return status.NewError(status.ActivityNotFound,"activity not found")
+		return common.NewError(common.ActivityNotFound,"activity not found")
 	}
 	act.CurrentProcessID = sql.NullInt64{}
 	tx.Save(act)
@@ -93,7 +93,7 @@ func (as *ActivityServiceImpl) UpdateActivity(ctx context.Context, req *activity
 	tx := db.Conn.Begin()
 	act := &model.Activity{}
 	if err := tx.Table("activity").Where("activity_id = ?", req.ActivityId).First(act).Error; gorm.IsRecordNotFoundError(err) {
-		return status.NewError(status.ActivityNotFound, "activity not found")
+		return common.NewError(common.ActivityNotFound, "activity not found")
 	}
 
 	act.Introduction = req.Introduction
@@ -106,7 +106,7 @@ func (as *ActivityServiceImpl) UpdateActivity(ctx context.Context, req *activity
 func (as *ActivityServiceImpl) CreateTeam(ctx context.Context, req *activity_pb.CreateTeamReq, rsp *activity_pb.IntWrap) error {
 	act := &model.Activity{}
 	if err := db.Conn.Table("activity").Where("activity_id = ?", req.ActivityId).Preload("Teams").First(act).Error; gorm.IsRecordNotFoundError(err) {
-		return status.NewError(status.ActivityNotFound, "activity not found")
+		return common.NewError(common.ActivityNotFound, "activity not found")
 	}
 
 	team := &model.ActivityTeam{
@@ -119,7 +119,7 @@ func (as *ActivityServiceImpl) CreateTeam(ctx context.Context, req *activity_pb.
 	err := db.Conn.Save(act).Error
 	if err != nil {
 		log.Println(err)
-		return status.NewError(status.InternalServerError, "create failed")
+		return common.NewError(common.InternalServerError, "create failed")
 	}
 
 	rsp.Val = int32(team.TeamID)
@@ -154,7 +154,7 @@ func (as *ActivityServiceImpl) GetTeamListByActivityID(ctx context.Context, req 
 func (as *ActivityServiceImpl) DeleteTeam(ctx context.Context, req *activity_pb.IntWrap, _ *empty.Empty) error {
 	team := &model.ActivityTeam{}
 	if err := db.Conn.Table("activity_team").Where("team_id = ?", req.Val).First(team).Error; gorm.IsRecordNotFoundError(err) {
-		return status.NewError(status.TeamNotFound, "team not found")
+		return common.NewError(common.TeamNotFound, "team not found")
 	}
 
 	db.Conn.Delete(team)
@@ -165,7 +165,7 @@ func (as *ActivityServiceImpl) DeleteTeam(ctx context.Context, req *activity_pb.
 func (as *ActivityServiceImpl) UpdateTeam(ctx context.Context, req *activity_pb.UpdateTeamReq, _ *empty.Empty) error {
 	team := &model.ActivityTeam{}
 	if err := db.Conn.Table("activity_team").Where("team_id = ?", req.TeamId).First(team).Error; gorm.IsRecordNotFoundError(err) {
-		return status.NewError(status.TeamNotFound, "team not found")
+		return common.NewError(common.TeamNotFound, "team not found")
 	}
 	if team.TeamName == req.TeamName {
 		return nil
@@ -179,7 +179,7 @@ func (as *ActivityServiceImpl) UpdateTeam(ctx context.Context, req *activity_pb.
 	}
 
 	if check > 0 {
-		return status.NewError(status.RepeatedTeamName, "repeated team name")
+		return common.NewError(common.RepeatedTeamName, "repeated team name")
 	}
 
 	team.Slogan = req.Slogan

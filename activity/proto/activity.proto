@@ -109,7 +109,7 @@ message TeamList {
 
 service ActivityService {
     // 发起活动
-    rpc CreateActivity(CreateActivityReq) returns (CommonResp);
+    rpc CreateActivity(CreateActivityReq) returns (IntWrap);
     // 删除活动
     rpc DeleteActivity(IntWrap) returns (google.protobuf.Empty);
     // 更新活动

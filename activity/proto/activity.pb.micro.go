@@ -44,7 +44,7 @@ func NewActivityServiceEndpoints() []*api.Endpoint {
 
 type ActivityService interface {
 	// 发起活动
-	CreateActivity(ctx context.Context, in *CreateActivityReq, opts ...client.CallOption) (*CommonResp, error)
+	CreateActivity(ctx context.Context, in *CreateActivityReq, opts ...client.CallOption) (*IntWrap, error)
 	// 删除活动
 	DeleteActivity(ctx context.Context, in *IntWrap, opts ...client.CallOption) (*empty.Empty, error)
 	// 更新活动
@@ -81,9 +81,9 @@ func NewActivityService(name string, c client.Client) ActivityService {
 	}
 }
 
-func (c *activityService) CreateActivity(ctx context.Context, in *CreateActivityReq, opts ...client.CallOption) (*CommonResp, error) {
+func (c *activityService) CreateActivity(ctx context.Context, in *CreateActivityReq, opts ...client.CallOption) (*IntWrap, error) {
 	req := c.c.NewRequest(c.name, "ActivityService.CreateActivity", in)
-	out := new(CommonResp)
+	out := new(IntWrap)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
@@ -205,7 +205,7 @@ func (c *activityService) GetHotActivities(ctx context.Context, in *empty.Empty,
 
 type ActivityServiceHandler interface {
 	// 发起活动
-	CreateActivity(context.Context, *CreateActivityReq, *CommonResp) error
+	CreateActivity(context.Context, *CreateActivityReq, *IntWrap) error
 	// 删除活动
 	DeleteActivity(context.Context, *IntWrap, *empty.Empty) error
 	// 更新活动
@@ -232,7 +232,7 @@ type ActivityServiceHandler interface {
 
 func RegisterActivityServiceHandler(s server.Server, hdlr ActivityServiceHandler, opts ...server.HandlerOption) error {
 	type activityService interface {
-		CreateActivity(ctx context.Context, in *CreateActivityReq, out *CommonResp) error
+		CreateActivity(ctx context.Context, in *CreateActivityReq, out *IntWrap) error
 		DeleteActivity(ctx context.Context, in *IntWrap, out *empty.Empty) error
 		UpdateActivity(ctx context.Context, in *UpdateActivityReq, out *empty.Empty) error
 		GetActivityByID(ctx context.Context, in *IntWrap, out *Activity) error
@@ -256,7 +256,7 @@ type activityServiceHandler struct {
 	ActivityServiceHandler
 }
 
-func (h *activityServiceHandler) CreateActivity(ctx context.Context, in *CreateActivityReq, out *CommonResp) error {
+func (h *activityServiceHandler) CreateActivity(ctx context.Context, in *CreateActivityReq, out *IntWrap) error {
 	return h.ActivityServiceHandler.CreateActivity(ctx, in, out)
 }
 

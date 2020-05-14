@@ -79,7 +79,7 @@ func TestDeleteActivity(t *testing.T)  {
 
 	// 拿到act id，删除act
 	activityId := rsp.Val
-	err = cli.DeleteActivity(context.Background(), &activity_pb.IntWrap{Val: activityId}, empty.Empty{})
+	err = cli.DeleteActivity(context.Background(), &activity_pb.IntWrap{Val: activityId}, &empty.Empty{})
 	if err != nil {
 		t.Fatal(err)
 	}
