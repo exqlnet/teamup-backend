@@ -10,5 +10,9 @@
     "password": "123456",
     "database": "teamup"
   },
+  "wechat": {
+    "app_id": "test_app_id",
+    "app_secret": "test_app_secret"
+  },
   "env": "dev"
 }

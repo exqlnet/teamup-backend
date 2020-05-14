@@ -10,5 +10,9 @@
     "password": "123456",
     "database": "teamup"
   },
+  "wechat": {
+    "app_id": "wx2edea90ce5cfe2c3",
+    "app_secret": "b89a066ad14330ad714478d74e04d0d8"
+  },
   "env": "prod"
 }
