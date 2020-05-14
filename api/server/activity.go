@@ -26,18 +26,18 @@ import (
 //     "$ref": "#/responses/badReq"
 func ActivityCreateHandler(c *gin.Context)  {
 	params := &struct {
-		Activity_name string `binding:"required";json:"activity_name"`
+		ActivityName string `json:"activity_name";binding:"required"`
 		Introduction string `binding:"required"`
 		Roles		[]string `binding:"required,dive,required"`
 		Illustration string `binding:"required"`
-		Authority_code int32 `binding:"required";json:"authority_code"`
-		Start_time int64	`binding:"required";json:"start_time"`
-		End_time int64 `binding:"required";json:"end_time"`
+		AuthorityCode int32 `json:"authority_code";binding:"required"`
+		StartTime int64	`json:"start_time";binding:"required"`
+		EndTime int64 `json:"end_time";binding:"required"`
 		Processes []struct{
-			Process_name string `binding:"required";json:"process_name"`
-			Start_time int64	`binding:"required";json:"start_time"`
+			ProcessName string `json:"process_name";binding:"required"`
+			StartTime int64	`json:"start_time";binding:"required"`
 			Tasks	[]struct{
-				Task_name string	`binding:"required";json:"task_name"`
+				TaskName string	`json:"task_name";binding:"required"`
 				Role string	`binding:"required";json:"role"`
 			}
 		}	`binding:"required"`
@@ -56,23 +56,23 @@ func ActivityCreateHandler(c *gin.Context)  {
 
 	userID := val.(int32)
 	activityID, err := svc.ActivitySvc.CreateActivity(context.Background(), &activity_pb.CreateActivityReq{
-		ActivityName:         params.Activity_name,
+		ActivityName:         params.ActivityName,
 		Introduction:         params.Introduction,
 		Roles: strings.Join(params.Roles, ","),
 		CreatorId:            userID,
 		Illustration:         params.Illustration,
-		AuthorityCode:        params.Authority_code,
+		AuthorityCode:        params.AuthorityCode,
 		Processes: func()[]*activity_pb.Process {
 			var processes []*activity_pb.Process
 			for _, pro := range params.Processes {
 				processes = append(processes, &activity_pb.Process{
-					ProcessName:          pro.Process_name,
-					StartTime:            pro.Start_time,
+					ProcessName:          pro.ProcessName,
+					StartTime:            pro.StartTime,
 					Tasks: func() []*activity_pb.Task {
 						var tasks []*activity_pb.Task
 						for _, task := range pro.Tasks {
 							tasks = append(tasks, &activity_pb.Task{
-								TaskName:             task.Task_name,
+								TaskName:             task.TaskName,
 								Role:                 task.Role,
 							})
 						}
@@ -82,8 +82,8 @@ func ActivityCreateHandler(c *gin.Context)  {
 			}
 			return processes
 		}(),
-		StartTime:            params.Start_time,
-		EndTime:              params.End_time,
+		StartTime:            params.StartTime,
+		EndTime:              params.EndTime,
 	})
 
 	if err != nil {
