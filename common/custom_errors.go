@@ -1,4 +1,4 @@
-package status
+package common
 
 import (
 	"encoding/json"
