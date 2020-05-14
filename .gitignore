@@ -16,7 +16,6 @@
 bin/
 .idea
 
-api/swagger/*
 config/bindata.go
 .DS_Store
 
