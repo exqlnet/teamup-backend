@@ -7,7 +7,8 @@ import (
 )
 
 func LoginRequired(c *gin.Context) {
-	if c.GetHeader("Authorization") == "" {
+	tokenString := c.GetHeader("Authorization")
+	if tokenString == "" || len(tokenString) < 8 {
 		unAuth(c)
 		return
 	}

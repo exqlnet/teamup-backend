@@ -26,48 +26,53 @@ import (
 //     "$ref": "#/responses/badReq"
 func ActivityCreateHandler(c *gin.Context)  {
 	params := &struct {
-		ActivityName string `binding:"required"`
+		Activity_name string `binding:"required";json:"activity_name"`
 		Introduction string `binding:"required"`
 		Roles		[]string `binding:"required,dive,required"`
 		Illustration string `binding:"required"`
-		AuthorityCode int32 `binding:"required"`
-		StartTime int64	`binding:"required"`
-		EndTime int64 `binding:"required"`
+		Authority_code int32 `binding:"required";json:"authority_code"`
+		Start_time int64	`binding:"required";json:"start_time"`
+		End_time int64 `binding:"required";json:"end_time"`
 		Processes []struct{
-			ProcessName string `binding:"required"`
-			StartTime int64	`binding:"required"`
+			Process_name string `binding:"required";json:"process_name"`
+			Start_time int64	`binding:"required";json:"start_time"`
 			Tasks	[]struct{
-				TaskName string	`binding:"required"`
-				Role string	`binding:"required"`
+				Task_name string	`binding:"required";json:"task_name"`
+				Role string	`binding:"required";json:"role"`
 			}
 		}	`binding:"required"`
 	}{}
-	c.BindJSON(params)
+
+	err := c.ShouldBind(params); if err != nil {
+		log.Printf("%v", err)
+		util.BadRequest(c)
+		return
+	}
 
 	val, e := c.Get("userId"); if !e {
 		c.AbortWithStatus(500)
 		return
 	}
 
-	userID := val.(int)
+	userID := val.(int32)
 	activityID, err := svc.ActivitySvc.CreateActivity(context.Background(), &activity_pb.CreateActivityReq{
-		ActivityName:         params.ActivityName,
+		ActivityName:         params.Activity_name,
 		Introduction:         params.Introduction,
 		Roles: strings.Join(params.Roles, ","),
-		CreatorId:            int32(userID),
+		CreatorId:            userID,
 		Illustration:         params.Illustration,
-		AuthorityCode:        params.AuthorityCode,
+		AuthorityCode:        params.Authority_code,
 		Processes: func()[]*activity_pb.Process {
 			var processes []*activity_pb.Process
 			for _, pro := range params.Processes {
 				processes = append(processes, &activity_pb.Process{
-					ProcessName:          pro.ProcessName,
-					StartTime:            pro.StartTime,
+					ProcessName:          pro.Process_name,
+					StartTime:            pro.Start_time,
 					Tasks: func() []*activity_pb.Task {
 						var tasks []*activity_pb.Task
 						for _, task := range pro.Tasks {
 							tasks = append(tasks, &activity_pb.Task{
-								TaskName:             task.TaskName,
+								TaskName:             task.Task_name,
 								Role:                 task.Role,
 							})
 						}
@@ -77,8 +82,8 @@ func ActivityCreateHandler(c *gin.Context)  {
 			}
 			return processes
 		}(),
-		StartTime:            params.StartTime,
-		EndTime:              params.EndTime,
+		StartTime:            params.Start_time,
+		EndTime:              params.End_time,
 	})
 
 	if err != nil {

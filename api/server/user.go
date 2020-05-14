@@ -55,6 +55,7 @@ func UserInfoHandler (c *gin.Context) {
 	userId, _ := c.Get("userId")
 	info, err := svc.UserServiceClient.GetUserInfo(context.Background(), &userPB.GetUserInfoReq{UserId:userId.(int32)})
 	if err != nil {
+		log.Printf("%v", err)
 		c.JSON(401, gin.H{
 			"code": 401,
 			"msg": "unauthorized",

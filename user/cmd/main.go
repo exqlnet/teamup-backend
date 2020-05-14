@@ -15,7 +15,6 @@ func main() {
 
 	service := micro.NewService(
 		micro.Name(SvcName),
-		micro.Address("127.0.0.1:8999"),
 	)
 
 	service.Init()
