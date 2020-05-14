@@ -16,7 +16,6 @@
 bin/
 .idea
 
-config/bindata.go
 .DS_Store
 
 user-service
