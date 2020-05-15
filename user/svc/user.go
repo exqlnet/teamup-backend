@@ -19,9 +19,10 @@ func (us *UserServiceImpl) Login(ctx context.Context, req *proto.LoginReq, rsp *
 	var wechatSession *util.WechatSession
 	var err error
 
+	// 获取wechatSession 区分测试环境和生产环境
 	if config.Cfg.Get("env").String("") != "product" {
 		wechatSession = &util.WechatSession{
-			Openid:     "testopenidid",
+			Openid:     req.Code,
 			SessionKey: "-",
 			Unionid:    "-",
 			Errcode:    0,

@@ -31,7 +31,7 @@ type User struct {
 	Openid   string `gorm:"column:openid"`
 	Username string `gorm:"column:username"`
 	Avatar   string `gorm:"column:avatar"`
-	DeletedAt time.Time `gorm:"column:deleted_at"`
+	DeletedAt *time.Time `sql:"index"`
 
 	JoinedActivities []Activity `gorm:"many2many:activity_join;jointable_foreignkey:user_id;association_jointable_foreignkey:activity_id"`
 	CreatedActivities []Activity `gorm:"foreignkey:CreatorID"`
